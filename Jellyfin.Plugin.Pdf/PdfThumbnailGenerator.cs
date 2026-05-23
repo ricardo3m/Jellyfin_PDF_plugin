@@ -38,6 +38,7 @@ public sealed class PdfThumbnailGenerator
 
         var extension = Path.GetExtension(thumbnailPath);
         var usePng = extension.Equals(".png", StringComparison.OrdinalIgnoreCase);
+        var outputExtension = usePng ? ".png" : ".jpg";
         var formatFlag = usePng ? "-png" : "-jpeg";
 
         var outputDirectory = Path.GetDirectoryName(thumbnailPath) ?? string.Empty;
@@ -50,8 +51,8 @@ public sealed class PdfThumbnailGenerator
             outputDirectory,
             Path.GetFileNameWithoutExtension(thumbnailPath));
 
-        var expectedOutputPath = Path.ChangeExtension(outputBasePath, usePng ? ".png" : ".jpg");
-        var suffixedOutputPath = outputBasePath + "-1" + (usePng ? ".png" : ".jpg");
+        var expectedOutputPath = Path.ChangeExtension(outputBasePath, outputExtension);
+        var suffixedOutputPath = outputBasePath + "-1" + outputExtension;
 
         var processStartInfo = new ProcessStartInfo
         {
@@ -86,8 +87,9 @@ public sealed class PdfThumbnailGenerator
         using (process)
         {
             var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
-            var error = await errorTask.ConfigureAwait(false);
+            var waitForExitTask = process.WaitForExitAsync(cancellationToken);
+            await Task.WhenAll(waitForExitTask, errorTask).ConfigureAwait(false);
+            var error = errorTask.Result;
 
             if (process.ExitCode != 0)
             {
@@ -107,7 +109,16 @@ public sealed class PdfThumbnailGenerator
 
         if (!producedOutputPath.Equals(thumbnailPath, StringComparison.OrdinalIgnoreCase))
         {
-            File.Move(producedOutputPath, thumbnailPath);
+            try
+            {
+                File.Move(producedOutputPath, thumbnailPath);
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to move generated thumbnail from '{producedOutputPath}' to '{thumbnailPath}'.",
+                    ex);
+            }
         }
 
         return true;
