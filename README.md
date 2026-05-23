@@ -1,0 +1,1 @@
+# Jellyfin_PDF_plugin
