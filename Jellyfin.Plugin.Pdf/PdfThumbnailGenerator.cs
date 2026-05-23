@@ -51,6 +51,7 @@ public sealed class PdfThumbnailGenerator
             Path.GetFileNameWithoutExtension(thumbnailPath));
 
         var expectedOutputPath = Path.ChangeExtension(outputBasePath, usePng ? ".png" : ".jpg");
+        var suffixedOutputPath = outputBasePath + "-1" + (usePng ? ".png" : ".jpg");
 
         var processStartInfo = new ProcessStartInfo
         {
@@ -95,14 +96,18 @@ public sealed class PdfThumbnailGenerator
             }
         }
 
-        if (!File.Exists(expectedOutputPath))
+        var producedOutputPath = File.Exists(expectedOutputPath)
+            ? expectedOutputPath
+            : (File.Exists(suffixedOutputPath) ? suffixedOutputPath : null);
+
+        if (producedOutputPath is null)
         {
             throw new InvalidOperationException("Thumbnail generation completed but no output file was produced.");
         }
 
-        if (!expectedOutputPath.Equals(thumbnailPath, StringComparison.Ordinal))
+        if (!producedOutputPath.Equals(thumbnailPath, StringComparison.OrdinalIgnoreCase))
         {
-            File.Move(expectedOutputPath, thumbnailPath);
+            File.Move(producedOutputPath, thumbnailPath);
         }
 
         return true;
