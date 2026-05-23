@@ -50,13 +50,14 @@ public sealed class PdfThumbnailGenerator
             outputDirectory,
             Path.GetFileNameWithoutExtension(thumbnailPath));
 
-        var expectedOutputPath = outputBasePath + (usePng ? ".png" : ".jpg");
+        var expectedOutputPath = Path.ChangeExtension(outputBasePath, usePng ? ".png" : ".jpg");
 
         var processStartInfo = new ProcessStartInfo
         {
             FileName = "pdftoppm",
+            UseShellExecute = false,
+            CreateNoWindow = true,
             RedirectStandardError = true,
-            RedirectStandardOutput = true
         };
 
         processStartInfo.ArgumentList.Add("-f");
@@ -83,11 +84,12 @@ public sealed class PdfThumbnailGenerator
 
         using (process)
         {
+            var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
             await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            var error = await errorTask.ConfigureAwait(false);
 
             if (process.ExitCode != 0)
             {
-                var error = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
                 throw new InvalidOperationException(
                     $"Failed to generate thumbnail from first page. ExitCode={process.ExitCode}. {error}");
             }
@@ -100,7 +102,7 @@ public sealed class PdfThumbnailGenerator
 
         if (!expectedOutputPath.Equals(thumbnailPath, StringComparison.Ordinal))
         {
-            File.Move(expectedOutputPath, thumbnailPath, overwrite: true);
+            File.Move(expectedOutputPath, thumbnailPath);
         }
 
         return true;
