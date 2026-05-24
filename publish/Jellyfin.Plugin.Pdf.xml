@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jellyfin.Plugin.Pdf</name>
+    </assembly>
+    <members>
+        <member name="T:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration">
+            <summary>
+            Plugin configuration.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.RenderResolutionDpi">
+            <summary>
+            Gets or sets the DPI used when rendering PDF pages as thumbnails.
+            Valid range: 36–600. Values outside this range are clamped.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PdfImageProvider">
+            <summary>
+            Provides thumbnail images for PDF files by rendering the first page.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.#ctor(Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.Pdf.PdfImageProvider})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.Pdf.PdfImageProvider"/> class.
+            </summary>
+            <param name="logger">Instance of the <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> interface.</param>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.PdfImageProvider.Name">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.Supports(MediaBrowser.Controller.Entities.BaseItem)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetSupportedImages(MediaBrowser.Controller.Entities.BaseItem)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImage(MediaBrowser.Controller.Entities.BaseItem,MediaBrowser.Model.Entities.ImageType,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PdfThumbnailGenerator">
+            <summary>
+            Generates thumbnail images from PDF files.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfThumbnailGenerator.#ctor(Jellyfin.Plugin.Pdf.PdfThumbnailOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.Pdf.PdfThumbnailGenerator"/> class.
+            </summary>
+            <param name="options">The thumbnail generation options.</param>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfThumbnailGenerator.EnsureThumbnailExistsAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Ensures a thumbnail exists for the given PDF file, generating one if needed.
+            </summary>
+            <param name="pdfPath">Path to the PDF file.</param>
+            <param name="thumbnailPath">Path where the thumbnail should be saved.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if a thumbnail was generated; false if one already existed.</returns>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PdfThumbnailOptions">
+            <summary>
+            Options for PDF thumbnail generation.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.PdfThumbnailOptions.MinRenderResolutionDpi">
+            <summary>Minimum allowed render resolution in DPI.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.PdfThumbnailOptions.MaxRenderResolutionDpi">
+            <summary>Maximum allowed render resolution in DPI.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.PdfThumbnailOptions.DefaultRenderResolutionDpi">
+            <summary>Default render resolution in DPI.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.PdfThumbnailOptions.RenderResolutionDpi">
+            <summary>
+            Gets or sets the render resolution in DPI. Must be between 36 and 600.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.Plugin">
+            <summary>
+            The PDF thumbnail plugin for Jellyfin.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Plugin.PluginGuid">
+            <summary>
+            The plugin GUID.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.Plugin.#ctor(MediaBrowser.Common.Configuration.IApplicationPaths,MediaBrowser.Model.Serialization.IXmlSerializer)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.Pdf.Plugin"/> class.
+            </summary>
+            <param name="applicationPaths">Instance of the <see cref="T:MediaBrowser.Common.Configuration.IApplicationPaths"/> interface.</param>
+            <param name="xmlSerializer">Instance of the <see cref="T:MediaBrowser.Model.Serialization.IXmlSerializer"/> interface.</param>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Plugin.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Plugin.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Plugin.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Plugin.Instance">
+            <summary>
+            Gets the current plugin instance.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.Plugin.GetPages">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
