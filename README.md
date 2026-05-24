@@ -18,6 +18,6 @@ Minimal plugin scaffold to support PDF thumbnails in Jellyfin.
 
 Higher values increase detail and file size.
 
-## Runtime dependency
+## Dependencies
 
-Thumbnail generation uses `pdftoppm` (Poppler). Ensure it is available on the host path.
+All dependencies are bundled as NuGet packages — no external tools required. The plugin uses [PDFtoImage](https://github.com/sungaila/PDFtoImage) for managed PDF rendering.
