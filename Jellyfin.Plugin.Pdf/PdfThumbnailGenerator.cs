@@ -2,15 +2,29 @@ using PDFtoImage;
 
 namespace Jellyfin.Plugin.Pdf;
 
+/// <summary>
+/// Generates thumbnail images from PDF files.
+/// </summary>
 public sealed class PdfThumbnailGenerator
 {
     private readonly PdfThumbnailOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PdfThumbnailGenerator"/> class.
+    /// </summary>
+    /// <param name="options">The thumbnail generation options.</param>
     public PdfThumbnailGenerator(PdfThumbnailOptions options)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
+    /// <summary>
+    /// Ensures a thumbnail exists for the given PDF file, generating one if needed.
+    /// </summary>
+    /// <param name="pdfPath">Path to the PDF file.</param>
+    /// <param name="thumbnailPath">Path where the thumbnail should be saved.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if a thumbnail was generated; false if one already existed.</returns>
     public Task<bool> EnsureThumbnailExistsAsync(
         string pdfPath,
         string thumbnailPath,
