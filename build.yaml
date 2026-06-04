@@ -15,7 +15,6 @@ artifacts:
   - "Jellyfin.Plugin.Pdf.dll"
   - "PDFtoImage.dll"
   - "SkiaSharp.dll"
-  - "HarfBuzzSharp.dll"
 changelog: |-
   - Initial release
   - PDF first-page thumbnail generation
