@@ -22,7 +22,6 @@ Plugin for Jellyfin that generates thumbnail images from PDF files by rendering 
    - `Jellyfin.Plugin.Pdf.dll`
    - `PDFtoImage.dll`
    - `SkiaSharp.dll`
-   - `HarfBuzzSharp.dll`
    - Any other native dependencies from the publish output
 
 3. Restart Jellyfin.
