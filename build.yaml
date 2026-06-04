@@ -2,8 +2,8 @@
 name: "PDF Thumbnails"
 guid: "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c"
 version: "1.0.0.0"
-targetAbi: "10.9.0.0"
-framework: "net8.0"
+targetAbi: "10.11.0.0"
+framework: "net9.0"
 overview: "Generates thumbnail images from the first page of PDF files."
 description: >
   This plugin automatically generates thumbnail images for PDF files
