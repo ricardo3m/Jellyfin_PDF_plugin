@@ -15,6 +15,18 @@
             Valid range: 36–600. Values outside this range are clamped.
             </summary>
         </member>
+        <member name="T:Jellyfin.Plugin.Pdf.NativeLibraryLoader">
+            <summary>
+            Preloads native libraries required by SkiaSharp and PDFtoImage when the assembly is loaded.
+            Jellyfin's plugin AssemblyLoadContext does not automatically probe runtimes/{rid}/native/,
+            so without this the P/Invoke calls in libSkiaSharp/libpdfium fail and the plugin malfunctions.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.NativeLibraryLoader.Initialize">
+            <summary>
+            Module initializer: runs once when this assembly is first loaded, before any type is used.
+            </summary>
+        </member>
         <member name="T:Jellyfin.Plugin.Pdf.PdfImageProvider">
             <summary>
             Provides thumbnail images for PDF files by rendering the first page.
@@ -109,6 +121,15 @@
             </summary>
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.Plugin.GetPages">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PluginServiceRegistrar">
+            <summary>
+            Registers the plugin's services with Jellyfin's dependency injection container.
+            Required in Jellyfin 10.9+ for plugin services to be discoverable.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PluginServiceRegistrar.RegisterServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,MediaBrowser.Controller.IServerApplicationHost)">
             <inheritdoc />
         </member>
     </members>

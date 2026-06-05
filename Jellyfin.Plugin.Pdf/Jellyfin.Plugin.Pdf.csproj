@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <NoWarn>CA1416</NoWarn>
+    <NoWarn>CA1416;CA2255</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Jellyfin.Plugin.Pdf</RootNamespace>
   </PropertyGroup>
@@ -22,5 +22,9 @@
   <ItemGroup>
     <None Remove="Configuration\configPage.html" />
     <EmbeddedResource Include="Configuration\configPage.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="meta.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>
