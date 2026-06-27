@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="docGrad" x1="0" y1="0" x2="140" y2="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8f8f8"/>
+      <stop offset="100%" stop-color="#e8e8e8"/>
+    </linearGradient>
+    <linearGradient id="skyGrad" x1="0" y1="110" x2="0" y2="186" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#bfdbfe"/>
+    </linearGradient>
+    <clipPath id="photoClip">
+      <rect x="74" y="110" width="108" height="76" rx="6"/>
+    </clipPath>
+    <filter id="docShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="3" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.4)"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="256" height="256" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Document (with shadow via filter) -->
+  <g filter="url(#docShadow)">
+    <path d="M57 43 L163 43 L199 79 L199 223 Q199 230 192 230 L64 230 Q57 230 57 223 Z"
+          fill="url(#docGrad)"/>
+  </g>
+
+  <!-- Fold triangle (darker shade) -->
+  <path d="M163 43 L199 79 L163 79 Z" fill="#c0c0c0"/>
+
+  <!-- Red header band (covers left part of doc, below fold) -->
+  <path d="M57 43 L163 43 L163 89 L57 89 Z" fill="#e63946"/>
+
+  <!-- Rounded top-left corner of header (matching doc shape) -->
+  <!-- The doc path already handles rounding at bottom, header is straight at top-left since doc is straight there -->
+
+  <!-- "PDF" text in header -->
+  <text x="110" y="76"
+        font-family="'Arial Black', Impact, Arial, sans-serif"
+        font-size="30" font-weight="900"
+        fill="white" text-anchor="middle" letter-spacing="3">PDF</text>
+
+  <!-- Photo/thumbnail preview box background -->
+  <g clip-path="url(#photoClip)">
+    <!-- Sky -->
+    <rect x="74" y="110" width="108" height="76" fill="url(#skyGrad)"/>
+    <!-- Horizon/ground -->
+    <rect x="74" y="162" width="108" height="24" fill="#4ade80"/>
+    <!-- Mountain far left -->
+    <polygon points="60,186 96,128 130,186" fill="#6366f1"/>
+    <!-- Mountain center -->
+    <polygon points="98,186 128,122 160,186" fill="#4f46e5"/>
+    <!-- Mountain right -->
+    <polygon points="140,186 166,140 182,186 182,186" fill="#6366f1"/>
+    <!-- Snow caps -->
+    <polygon points="96,128 104,138 88,138" fill="white" opacity="0.9"/>
+    <polygon points="128,122 136,133 120,133" fill="white" opacity="0.9"/>
+    <polygon points="166,140 172,149 160,149" fill="white" opacity="0.9"/>
+    <!-- Sun -->
+    <circle cx="162" cy="120" r="10" fill="#fcd34d"/>
+    <!-- Sun glow -->
+    <circle cx="162" cy="120" r="14" fill="rgba(252,211,77,0.25)"/>
+  </g>
+  <!-- Photo frame border -->
+  <rect x="74" y="110" width="108" height="76" rx="6"
+        fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Thin lines below photo (mimicking text content) -->
+  <rect x="74" y="198" width="82" height="5" rx="2.5" fill="#9ca3af"/>
+  <rect x="74" y="210" width="58" height="5" rx="2.5" fill="#d1d5db"/>
+
+  <!-- Small image icon overlay on fold corner (hint at the plugin's purpose) -->
+  <rect x="168" y="82" width="24" height="18" rx="3" fill="#e63946"/>
+  <polygon points="170,98 178,88 184,93 188,88 190,98" fill="white" opacity="0.8"/>
+  <circle cx="172" cy="87" r="2.5" fill="white" opacity="0.8"/>
+</svg>

@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Include="meta.json" CopyToOutputDirectory="Always" />
+    <None Include="thumb.png" CopyToOutputDirectory="Always" Condition="Exists('thumb.png')" />
   </ItemGroup>
 
   <!--
