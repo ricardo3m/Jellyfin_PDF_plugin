@@ -14,20 +14,26 @@ Plugin for Jellyfin that generates thumbnail images from PDF files by rendering 
 ### Manual Installation
 
 1. Download the latest release or build the plugin yourself (see below).
-2. Copy the following DLLs to your Jellyfin plugins directory:
+2. Create the plugin folder in your Jellyfin data directory:
    ```
    <Jellyfin Data Path>/plugins/PdfThumbnails/
    ```
-   Required files:
+   - **Linux**: typically `/var/lib/jellyfin/plugins/PdfThumbnails/`
+   - **Windows**: typically `C:\ProgramData\Jellyfin\Server\plugins\PdfThumbnails\`
+
+3. Copy all files from the `publish/` folder to the plugin directory, including the `runtimes/` subfolder (or just the subfolder matching your OS, e.g. `runtimes/linux-x64/`):
    - `Jellyfin.Plugin.Pdf.dll`
    - `PDFtoImage.dll`
    - `SkiaSharp.dll`
-   - Any other native dependencies from the publish output
+   - `meta.json`
+   - `runtimes/` (native libraries for PDF and image rendering)
 
-3. Restart Jellyfin.
-4. The plugin will appear in **Dashboard → Plugins**.
+4. Restart Jellyfin.
+5. The plugin will appear in **Dashboard → Plugins**.
 
 ### Building from Source
+
+Requires the **.NET 9 SDK** installed locally.
 
 ```bash
 dotnet publish Jellyfin.Plugin.Pdf/Jellyfin.Plugin.Pdf.csproj -c Release -o ./publish
@@ -51,5 +57,5 @@ All dependencies are bundled as NuGet packages — no external tools required. T
 
 ## Compatibility
 
-- **Jellyfin Server**: 10.9.0 or later
-- **Framework**: .NET 8.0
+- **Jellyfin Server**: 10.11.0 or later
+- **Framework**: .NET 9.0
