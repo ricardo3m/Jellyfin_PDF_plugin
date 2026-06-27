@@ -27,4 +27,34 @@
   <ItemGroup>
     <None Include="meta.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
+
+  <!--
+    Rename native libraries to a non-.dll extension after build and publish.
+    Jellyfin's PluginManager scans all *.dll files recursively in the plugin folder
+    and tries to load them as managed assemblies. Native DLLs (libSkiaSharp, pdfium)
+    cause a BadImageFormatException which disables the entire plugin.
+    NativeLibraryLoader.cs loads the renamed files via NativeLibrary.Load() at runtime.
+  -->
+  <Target Name="RenameNativeLibsAfterBuild" AfterTargets="Build">
+    <ItemGroup>
+      <_NativeLibs Include="$(OutputPath)runtimes\**\native\*.dll;
+                            $(OutputPath)runtimes\**\native\*.dylib;
+                            $(OutputPath)runtimes\**\native\*.so" />
+    </ItemGroup>
+    <Move SourceFiles="@(_NativeLibs)"
+          DestinationFiles="@(_NativeLibs->'%(Identity).native')"
+          Condition="Exists('%(Identity)')" />
+  </Target>
+
+  <Target Name="RenameNativeLibsAfterPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_PublishedNativeLibs Include="$(PublishDir)runtimes\**\native\*.dll;
+                                     $(PublishDir)runtimes\**\native\*.dylib;
+                                     $(PublishDir)runtimes\**\native\*.so" />
+    </ItemGroup>
+    <Move SourceFiles="@(_PublishedNativeLibs)"
+          DestinationFiles="@(_PublishedNativeLibs->'%(Identity).native')"
+          Condition="Exists('%(Identity)')" />
+  </Target>
+
 </Project>
