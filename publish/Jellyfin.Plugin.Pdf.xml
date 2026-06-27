@@ -16,16 +16,16 @@
             </summary>
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.NativeLibraryLoader">
-            <summary>
-            Preloads native libraries required by SkiaSharp and PDFtoImage when the assembly is loaded.
-            Jellyfin's plugin AssemblyLoadContext does not automatically probe runtimes/{rid}/native/,
-            so without this the P/Invoke calls in libSkiaSharp/libpdfium fail and the plugin malfunctions.
-            </summary>
-        </member>
-        <member name="M:Jellyfin.Plugin.Pdf.NativeLibraryLoader.Initialize">
-            <summary>
-            Module initializer: runs once when this assembly is first loaded, before any type is used.
-            </summary>
+             <summary>
+             Preloads native libraries required by SkiaSharp and PDFtoImage when the assembly is loaded.
+            
+             Jellyfin's PluginManager scans all *.dll files recursively in the plugin folder and tries to
+             load them as managed assemblies. Native DLLs (libSkiaSharp, pdfium) cause a
+             BadImageFormatException which disables the entire plugin. To prevent this, the build renames
+             native files to *.native (e.g. libSkiaSharp.dll.native) so the *.dll glob skips them.
+             This class loads the renamed files via NativeLibrary.Load() and registers a DllImportResolver
+             on SkiaSharp/PDFtoImage assemblies so their P/Invoke calls resolve to the preloaded handles.
+             </summary>
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.PdfImageProvider">
             <summary>
