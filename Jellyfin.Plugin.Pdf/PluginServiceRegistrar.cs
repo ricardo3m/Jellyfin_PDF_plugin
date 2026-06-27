@@ -14,6 +14,6 @@ public class PluginServiceRegistrar : IPluginServiceRegistrator
     /// <inheritdoc />
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
-        serviceCollection.AddSingleton<IDynamicImageProvider, PdfImageProvider>();
+        serviceCollection.AddSingleton<IRemoteImageProvider, PdfImageProvider>();
     }
 }
