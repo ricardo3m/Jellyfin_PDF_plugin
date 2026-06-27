@@ -58,8 +58,16 @@ internal static class NativeLibraryLoader
             var path = Path.Combine(baseDir, "runtimes", rid, "native", libName);
             if (File.Exists(path))
             {
-                NativeLibrary.Load(path);
-                return;
+                try
+                {
+                    NativeLibrary.Load(path);
+                    return;
+                }
+                catch
+                {
+                    // If loading fails (e.g. missing system dependencies), continue trying other RIDs.
+                    // The plugin will still load as Active; actual PDF conversion attempts will surface the error.
+                }
             }
         }
     }
