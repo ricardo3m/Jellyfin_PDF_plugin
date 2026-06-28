@@ -58,4 +58,24 @@
           Condition="Exists('%(Identity)')" />
   </Target>
 
+  <!--
+    Copy the freshly built plugin assembly into the repo-root publish/ folder so the
+    deployable folder always reflects the latest build. Only the managed plugin DLL and
+    its XML doc change between builds; native runtimes are committed separately.
+  -->
+  <PropertyGroup>
+    <RepoPublishDir>$(MSBuildProjectDirectory)\..\publish\</RepoPublishDir>
+  </PropertyGroup>
+
+  <Target Name="CopyToRepoPublish" AfterTargets="Build">
+    <ItemGroup>
+      <_RepoPublishFiles Include="$(OutputPath)$(AssemblyName).dll;
+                                  $(OutputPath)$(AssemblyName).xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_RepoPublishFiles)"
+          DestinationFolder="$(RepoPublishDir)"
+          SkipUnchangedFiles="false"
+          Condition="Exists('$(RepoPublishDir)') And Exists('%(Identity)')" />
+  </Target>
+
 </Project>

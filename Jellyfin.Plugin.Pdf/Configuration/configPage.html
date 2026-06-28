@@ -5,7 +5,7 @@
 </head>
 <body>
     <div id="PdfThumbnailsConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
-         data-require="emby-input,emby-button">
+         data-require="emby-input,emby-select,emby-button">
         <div data-role="content">
             <div class="content-primary">
                 <form id="PdfThumbnailsConfigForm">
@@ -57,17 +57,42 @@
             pluginUniqueId: 'a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c'
         };
 
-        document.querySelector('#PdfThumbnailsConfigPage')
-            .addEventListener('pagebeforeshow', function () {
-                Dashboard.showLoadingMsg();
-                ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
-                    var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
-                    var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
-                    document.querySelector('#RenderResolutionDpi').value = (dpi != null) ? dpi : 150;
-                    document.querySelector('#ThumbnailPaddingMode').value = (padding != null) ? padding : 'White';
-                    Dashboard.hideLoadingMsg();
-                });
+        var PaddingModeNames = ['White', 'Transparent', 'None'];
+
+        function normalizePadding(value) {
+            if (typeof value === 'number') {
+                return PaddingModeNames[value] || 'White';
+            }
+            return (value != null) ? value : 'White';
+        }
+
+        function loadPdfThumbnailsConfig() {
+            Dashboard.showLoadingMsg();
+            return ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
+                var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
+                var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
+                var dpiInput = document.querySelector('#RenderResolutionDpi');
+                var paddingSelect = document.querySelector('#ThumbnailPaddingMode');
+                if (dpiInput) {
+                    dpiInput.value = (dpi != null) ? dpi : 150;
+                }
+                if (paddingSelect) {
+                    paddingSelect.value = normalizePadding(padding);
+                }
+                Dashboard.hideLoadingMsg();
+            }).catch(function (err) {
+                console.error('PDF Thumbnails: failed to load configuration', err);
+                Dashboard.hideLoadingMsg();
             });
+        }
+
+        var pdfConfigPage = document.querySelector('#PdfThumbnailsConfigPage');
+        pdfConfigPage.addEventListener('pageshow', loadPdfThumbnailsConfig);
+        pdfConfigPage.addEventListener('viewshow', loadPdfThumbnailsConfig);
+
+        // Newer Jellyfin clients load the config page without dispatching the legacy
+        // page events, so populate the fields immediately when the script runs too.
+        loadPdfThumbnailsConfig();
 
         document.querySelector('#PdfThumbnailsConfigForm')
             .addEventListener('submit', function (e) {
