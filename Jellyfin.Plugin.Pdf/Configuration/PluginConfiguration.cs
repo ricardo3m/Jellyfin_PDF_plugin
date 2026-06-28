@@ -9,7 +9,7 @@ public class PluginConfiguration : BasePluginConfiguration
 {
     private const int MinDpi = 36;
     private const int MaxDpi = 600;
-    private const int DefaultDpi = 150;
+    private const int DefaultDpi = 90;
 
     private int _renderResolutionDpi = DefaultDpi;
 
@@ -26,5 +26,5 @@ public class PluginConfiguration : BasePluginConfiguration
     /// <summary>
     /// Gets or sets the padding mode applied when squaring the thumbnail.
     /// </summary>
-    public PaddingMode ThumbnailPaddingMode { get; set; } = PaddingMode.White;
+    public PaddingMode ThumbnailPaddingMode { get; set; } = PaddingMode.Transparent;
 }

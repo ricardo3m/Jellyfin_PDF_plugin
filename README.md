@@ -53,8 +53,8 @@ Navigate to **Dashboard → Plugins → PDF Thumbnails** to configure:
 
 | Setting | Description | Default | Range |
 |---------|-------------|---------|-------|
-| **Render Resolution (DPI)** | Controls thumbnail sharpness. Higher values produce better quality but take longer to render. | `150` | 36 – 600 |
-| **Thumbnail Padding** | Background fill applied when squaring the thumbnail. *White padding* works best for JPEG covers; *Transparent* preserves the page background; *No padding* keeps the original aspect ratio. | `White padding` | — |
+| **Render Resolution (DPI)** | Controls thumbnail sharpness. Higher values produce better quality but take longer to render. | `90` | 36 – 600 |
+| **Thumbnail Padding** | Background fill applied when squaring the thumbnail. *White padding* works best for JPEG covers; *Transparent* preserves the page background; *No padding* keeps the original aspect ratio. | `Transparent padding` | — |
 
 ## Dependencies
 

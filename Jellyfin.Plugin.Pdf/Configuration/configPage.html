@@ -17,11 +17,11 @@
                                 </label>
                                 <input id="RenderResolutionDpi" name="RenderResolutionDpi"
                                        type="number" is="emby-input"
-                                       min="36" max="600" step="1" placeholder="150" />
+                                       min="36" max="600" step="1" placeholder="90" />
                                 <div class="fieldDescription">
                                     Controls the quality of generated PDF thumbnails.
                                     Higher values produce sharper images but increase processing time.
-                                    Valid range: 36–600. Default: 150.
+                                    Valid range: 36–600. Default: 90.
                                 </div>
                             </div>
                             <div class="inputContainer">
@@ -60,9 +60,9 @@
 
             function normalizePadding(value) {
                 if (typeof value === 'number') {
-                    return PaddingModeNames[value] || 'White';
+                    return PaddingModeNames[value] || 'Transparent';
                 }
-                return (value != null) ? value : 'White';
+                return (value != null) ? value : 'Transparent';
             }
 
             $('.pluginConfigurationPage').on('pageshow', function () {
@@ -71,8 +71,8 @@
                 ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                     var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
                     var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
-                    page.querySelector('#RenderResolutionDpi').value = (dpi != null) ? dpi : 150;
-                    page.querySelector('#ThumbnailPaddingMode').value = normalizePadding(padding);
+                    page.querySelector('#RenderResolutionDpi').value = (dpi != null) ? dpi : 90;
+                    page.querySelector('#ThumbnailPaddingMode').value = normalizePadding(padding) || 'Transparent';
                     Dashboard.hideLoadingMsg();
                 });
             });
@@ -81,7 +81,7 @@
                 var page = document.querySelector('#PdfThumbnailsConfigPage');
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(pluginId).then(function (config) {
-                    config.RenderResolutionDpi = parseInt(page.querySelector('#RenderResolutionDpi').value) || 150;
+                    config.RenderResolutionDpi = parseInt(page.querySelector('#RenderResolutionDpi').value) || 90;
                     var paddingIndex = PaddingModeNames.indexOf(page.querySelector('#ThumbnailPaddingMode').value);
                     config.ThumbnailPaddingMode = (paddingIndex >= 0) ? paddingIndex : 0;
                     ApiClient.updatePluginConfiguration(pluginId, config).then(Dashboard.processPluginConfigurationUpdateResult);
