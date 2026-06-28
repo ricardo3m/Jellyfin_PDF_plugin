@@ -44,71 +44,51 @@
                         </div>
                     </div>
                     <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                        <button is="emby-button" type="button" id="btnSavePdfConfig" class="raised button-submit block emby-button">
                             <span>Save</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
+
     <script type="text/javascript">
-        var PdfThumbnailsConfig = {
-            pluginUniqueId: 'a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c'
-        };
+        (function () {
+            var pluginId = 'a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c';
 
-        var PaddingModeNames = ['White', 'Transparent', 'None'];
+            var PaddingModeNames = ['White', 'Transparent', 'None'];
 
-        function normalizePadding(value) {
-            if (typeof value === 'number') {
-                return PaddingModeNames[value] || 'White';
+            function normalizePadding(value) {
+                if (typeof value === 'number') {
+                    return PaddingModeNames[value] || 'White';
+                }
+                return (value != null) ? value : 'White';
             }
-            return (value != null) ? value : 'White';
-        }
 
-        function loadPdfThumbnailsConfig() {
-            Dashboard.showLoadingMsg();
-            return ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
-                var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
-                var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
-                var dpiInput = document.querySelector('#RenderResolutionDpi');
-                var paddingSelect = document.querySelector('#ThumbnailPaddingMode');
-                if (dpiInput) {
-                    dpiInput.value = (dpi != null) ? dpi : 150;
-                }
-                if (paddingSelect) {
-                    paddingSelect.value = normalizePadding(padding);
-                }
-                Dashboard.hideLoadingMsg();
-            }).catch(function (err) {
-                console.error('PDF Thumbnails: failed to load configuration', err);
-                Dashboard.hideLoadingMsg();
-            });
-        }
-
-        var pdfConfigPage = document.querySelector('#PdfThumbnailsConfigPage');
-        pdfConfigPage.addEventListener('pageshow', loadPdfThumbnailsConfig);
-        pdfConfigPage.addEventListener('viewshow', loadPdfThumbnailsConfig);
-
-        // Newer Jellyfin clients load the config page without dispatching the legacy
-        // page events, so populate the fields immediately when the script runs too.
-        loadPdfThumbnailsConfig();
-
-        document.querySelector('#PdfThumbnailsConfigForm')
-            .addEventListener('submit', function (e) {
+            $('.pluginConfigurationPage').on('pageshow', function () {
+                var page = this;
                 Dashboard.showLoadingMsg();
-                ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
-                    var dpiKey = (config.RenderResolutionDpi !== undefined) ? 'RenderResolutionDpi' : 'renderResolutionDpi';
-                    var paddingKey = (config.ThumbnailPaddingMode !== undefined) ? 'ThumbnailPaddingMode' : 'thumbnailPaddingMode';
-                    config[dpiKey] = parseInt(document.querySelector('#RenderResolutionDpi').value) || 150;
-                    config[paddingKey] = document.querySelector('#ThumbnailPaddingMode').value;
-                    ApiClient.updatePluginConfiguration(PdfThumbnailsConfig.pluginUniqueId, config).then(function () {
-                        Dashboard.processPluginConfigurationUpdateResult();
-                    });
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
+                    var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
+                    page.querySelector('#RenderResolutionDpi').value = (dpi != null) ? dpi : 150;
+                    page.querySelector('#ThumbnailPaddingMode').value = normalizePadding(padding);
+                    Dashboard.hideLoadingMsg();
                 });
-                e.preventDefault();
-                return false;
             });
+
+            $('#btnSavePdfConfig').on('click', function () {
+                var page = document.querySelector('#PdfThumbnailsConfigPage');
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    config.RenderResolutionDpi = parseInt(page.querySelector('#RenderResolutionDpi').value) || 150;
+                    var paddingIndex = PaddingModeNames.indexOf(page.querySelector('#ThumbnailPaddingMode').value);
+                    config.ThumbnailPaddingMode = (paddingIndex >= 0) ? paddingIndex : 0;
+                    ApiClient.updatePluginConfiguration(pluginId, config).then(Dashboard.processPluginConfigurationUpdateResult);
+                });
+            });
+        })();
     </script>
+    </div>
 </body>
 </html>
