@@ -17,11 +17,28 @@
                                 </label>
                                 <input id="RenderResolutionDpi" name="RenderResolutionDpi"
                                        type="number" is="emby-input"
-                                       min="36" max="600" step="1" />
+                                       min="36" max="600" step="1" placeholder="150" />
                                 <div class="fieldDescription">
                                     Controls the quality of generated PDF thumbnails.
                                     Higher values produce sharper images but increase processing time.
                                     Valid range: 36–600. Default: 150.
+                                </div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel" for="ThumbnailPaddingMode">
+                                    Thumbnail Padding
+                                </label>
+                                <select id="ThumbnailPaddingMode" name="ThumbnailPaddingMode"
+                                        is="emby-select" class="emby-select-withcolor emby-select">
+                                    <option value="White">White padding</option>
+                                    <option value="Transparent">Transparent padding</option>
+                                    <option value="None">No padding</option>
+                                </select>
+                                <div class="fieldDescription">
+                                    Controls the background fill used when squaring the thumbnail.
+                                    White padding works best for JPEG covers;
+                                    transparent preserves the page background;
+                                    no padding keeps the original page proportions.
                                 </div>
                             </div>
                         </div>
@@ -41,10 +58,11 @@
         };
 
         document.querySelector('#PdfThumbnailsConfigPage')
-            .addEventListener('pageshow', function () {
+            .addEventListener('pagebeforeshow', function () {
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
-                    document.querySelector('#RenderResolutionDpi').value = config.RenderResolutionDpi || 150;
+                    document.querySelector('#RenderResolutionDpi').value = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : 150;
+                    document.querySelector('#ThumbnailPaddingMode').value = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : 0;
                     Dashboard.hideLoadingMsg();
                 });
             });
@@ -54,6 +72,7 @@
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
                     config.RenderResolutionDpi = parseInt(document.querySelector('#RenderResolutionDpi').value) || 150;
+                    config.ThumbnailPaddingMode = document.querySelector('#ThumbnailPaddingMode').value;
                     ApiClient.updatePluginConfiguration(PdfThumbnailsConfig.pluginUniqueId, config).then(function () {
                         Dashboard.processPluginConfigurationUpdateResult();
                     });

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SkiaSharp;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -106,14 +107,17 @@ public class PdfImageProvider : IRemoteImageProvider
 
         try
         {
-            var dpi = Plugin.Instance?.Configuration.RenderResolutionDpi ?? 150;
+            var config = Plugin.Instance?.Configuration;
+            var dpi = config?.RenderResolutionDpi ?? 150;
+            var paddingMode = config?.ThumbnailPaddingMode ?? Configuration.PaddingMode.White;
             var renderOptions = new RenderOptions(Dpi: dpi);
 
-            var memoryStream = new MemoryStream();
+            // Render the first PDF page to an in-memory bitmap.
+            var pageStream = new MemoryStream();
             using (var pdfStream = File.OpenRead(pdfPath))
             {
-                Conversion.SaveJpeg(
-                    memoryStream,
+                Conversion.SavePng(
+                    pageStream,
                     pdfStream,
                     page: 0,
                     leaveOpen: false,
@@ -121,11 +125,39 @@ public class PdfImageProvider : IRemoteImageProvider
                     options: renderOptions);
             }
 
+            pageStream.Position = 0;
+            using var pageBitmap = SKBitmap.Decode(pageStream);
+
+            var memoryStream = new MemoryStream();
+
+            if (paddingMode == Configuration.PaddingMode.None)
+            {
+                // No padding: output the page at its original aspect ratio.
+                pageBitmap.Encode(memoryStream, SKEncodedImageFormat.Png, 100);
+            }
+            else
+            {
+                var side = Math.Max(pageBitmap.Width, pageBitmap.Height);
+                var fillColor = paddingMode == Configuration.PaddingMode.White
+                    ? SKColors.White
+                    : SKColors.Transparent;
+
+                using var squareBitmap = new SKBitmap(side, side, SKColorType.Rgba8888, SKAlphaType.Premul);
+                using var canvas = new SKCanvas(squareBitmap);
+                canvas.Clear(fillColor);
+                canvas.DrawBitmap(
+                    pageBitmap,
+                    (side - pageBitmap.Width) / 2f,
+                    (side - pageBitmap.Height) / 2f);
+                canvas.Flush();
+                squareBitmap.Encode(memoryStream, SKEncodedImageFormat.Png, 100);
+            }
+
             memoryStream.Position = 0;
 
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Content = new StreamContent(memoryStream);
-            response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
             return Task.FromResult(response);
         }
         catch (Exception ex)

@@ -22,4 +22,9 @@ public class PluginConfiguration : BasePluginConfiguration
         get => _renderResolutionDpi;
         set => _renderResolutionDpi = Math.Clamp(value, MinDpi, MaxDpi);
     }
+
+    /// <summary>
+    /// Gets or sets the padding mode applied when squaring the thumbnail.
+    /// </summary>
+    public PaddingMode ThumbnailPaddingMode { get; set; } = PaddingMode.White;
 }
