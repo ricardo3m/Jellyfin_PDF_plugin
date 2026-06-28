@@ -1,0 +1,56 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build plugin with JPRM
+        id: jprm
+        uses: oddstr13/jellyfin-plugin-repository-manager@master
+        with:
+          path: .
+          output: ./artifacts
+
+      - name: Create GitHub Release and upload zip
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.jprm.outputs.artifact }}
+          generate_release_notes: true
+
+      - name: Update manifest.json
+        env:
+          PIP_BREAK_SYSTEM_PACKAGES: '1'
+        run: |
+          pip install --quiet jprm
+
+          ARTIFACT="${{ steps.jprm.outputs.artifact }}"
+          FILENAME="$(basename "${ARTIFACT}")"
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${FILENAME}"
+
+          # Initialise the manifest on the very first release
+          if [ ! -f manifest.json ]; then
+            jprm repo init .
+          fi
+
+          jprm repo add --url "${DOWNLOAD_URL}" . "${ARTIFACT}"
+
+      - name: Commit and push manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git diff --staged --quiet && echo "manifest unchanged" && exit 0
+          git commit -m "chore: update manifest for ${{ github.ref_name }}"
+          git push origin HEAD:${{ github.event.repository.default_branch }}
