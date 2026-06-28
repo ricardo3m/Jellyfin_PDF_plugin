@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jellyfin PDF Thumbnails Plugin</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #24292e; max-width: 860px; margin: 40px auto; padding: 0 20px; }
+    h1, h2, h3 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 1.5em; }
+    h1 { font-size: 2em; } h2 { font-size: 1.5em; } h3 { font-size: 1.25em; border: none; }
+    a { color: #0366d6; text-decoration: none; } a:hover { text-decoration: underline; }
+    code { background: #f6f8fa; border-radius: 3px; padding: 0.2em 0.4em; font-family: "SFMono-Regular", Consolas, monospace; font-size: 85%; }
+    pre { background: #f6f8fa; border-radius: 6px; padding: 16px; overflow: auto; }
+    pre code { background: none; padding: 0; font-size: 93%; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #dfe2e5; padding: 8px 13px; text-align: left; }
+    th { background: #f6f8fa; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafafa; }
+    ol, ul { padding-left: 2em; }
+    li { margin: 0.25em 0; }
+    em { font-style: italic; }
+    strong { font-weight: 600; }
+    hr { border: none; border-top: 1px solid #eaecef; margin: 2em 0; }
+  </style>
+</head>
+<body>
+
+<h1>Jellyfin PDF Thumbnails Plugin</h1>
+
+<p>A plugin for <a href="https://jellyfin.org/">Jellyfin</a> that automatically generates thumbnail images from PDF files by rendering the first page.</p>
+
+<h2>Features</h2>
+<ul>
+  <li>Automatically generates cover thumbnails for PDF files in your Jellyfin library</li>
+  <li>Renders the first page of each PDF as a cover image</li>
+  <li>Integrates with Jellyfin's native image provider system (<code>IDynamicImageProvider</code>)</li>
+  <li>Configurable render resolution (DPI) for quality vs. performance trade-off</li>
+  <li>Configurable thumbnail padding mode (white, transparent, or no padding)</li>
+  <li>Supports all major platforms: Windows, Linux (x64, ARM, musl), macOS</li>
+</ul>
+
+<h2>Installation</h2>
+
+<h3>Manual Installation</h3>
+<ol>
+  <li>Download the latest release zip from the <a href="../../releases">Releases</a> page.</li>
+  <li>
+    Extract all files into a new folder inside your Jellyfin plugins directory:
+    <pre><code>&lt;Jellyfin Data Path&gt;/plugins/Jellyfin_PDF_plugin/</code></pre>
+    <table>
+      <thead><tr><th>OS</th><th>Default path</th></tr></thead>
+      <tbody>
+        <tr><td>Linux</td><td><code>/var/lib/jellyfin/plugins/Jellyfin_PDF_plugin/</code></td></tr>
+        <tr><td>Windows (tray)</td><td><code>%ProgramData%\Jellyfin\Server\plugins\Jellyfin_PDF_plugin\</code></td></tr>
+        <tr><td>Windows (portable)</td><td><code>%LocalAppData%\jellyfin\plugins\Jellyfin_PDF_plugin\</code></td></tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    The release zip contains:
+    <ul>
+      <li><code>Jellyfin.Plugin.Pdf.dll</code></li>
+      <li><code>PDFtoImage.dll</code></li>
+      <li><code>SkiaSharp.dll</code></li>
+      <li><code>meta.json</code></li>
+      <li><code>runtimes/</code> — platform-specific native libraries (copy the full folder or only the subfolder matching your OS, e.g. <code>runtimes/linux-x64/</code>)</li>
+    </ul>
+  </li>
+  <li>Restart Jellyfin. The plugin will appear under <strong>Dashboard → Plugins</strong>.</li>
+</ol>
+
+<h3>Building from Source</h3>
+<p>Requires the <a href="https://dotnet.microsoft.com/download/dotnet/9.0">.NET 9 SDK</a>.</p>
+<pre><code>git clone https://github.com/YOUR_USERNAME/jellyfin-plugin-pdf.git
+cd jellyfin-plugin-pdf
+dotnet publish Jellyfin.Plugin.Pdf/Jellyfin.Plugin.Pdf.csproj -c Release</code></pre>
+<p>Copy the contents of <code>Jellyfin.Plugin.Pdf/bin/Release/net9.0/publish/</code> to your Jellyfin plugins folder.</p>
+
+<h2>Configuration</h2>
+<p>Navigate to <strong>Dashboard → Plugins → PDF Thumbnails</strong> to configure:</p>
+<table>
+  <thead><tr><th>Setting</th><th>Description</th><th>Default</th><th>Range</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Render Resolution (DPI)</strong></td>
+      <td>Controls thumbnail sharpness. Higher values produce better quality but take longer to render.</td>
+      <td><code>90</code></td>
+      <td>36 – 600</td>
+    </tr>
+    <tr>
+      <td><strong>Thumbnail Padding</strong></td>
+      <td>Background fill applied when squaring the thumbnail. <em>White padding</em> works best for JPEG covers; <em>Transparent</em> preserves the page background; <em>No padding</em> keeps the original aspect ratio.</td>
+      <td><code>Transparent padding</code></td>
+      <td>—</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Dependencies</h2>
+<p>All dependencies are bundled — no external tools or system libraries need to be installed separately.</p>
+<table>
+  <thead><tr><th>Package</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/sungaila/PDFtoImage">PDFtoImage</a></td>
+      <td>Managed .NET PDF rendering via PDFium</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/mono/SkiaSharp">SkiaSharp</a></td>
+      <td>Image encoding and compositing</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Compatibility</h2>
+<table>
+  <thead><tr><th>Component</th><th>Version</th></tr></thead>
+  <tbody>
+    <tr><td>Jellyfin Server</td><td>10.11.0 or later</td></tr>
+    <tr><td>.NET</td><td>9.0</td></tr>
+    <tr><td>Platforms</td><td>Windows (x64, x86, ARM64), Linux (x64, x86, ARM, ARM64, musl variants), macOS (x64, ARM64)</td></tr>
+  </tbody>
+</table>
+
+<h2>Contributing</h2>
+<p>Pull requests and issues are welcome. Please open an issue before starting significant work so we can discuss the approach.</p>
+
+<h2>License</h2>
+<p>This project is licensed under the <a href="LICENSE">MIT License</a>.</p>
+
+</body>
+</html>
