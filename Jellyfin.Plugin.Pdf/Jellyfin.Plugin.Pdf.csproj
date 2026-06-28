@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <None Include="meta.json" CopyToOutputDirectory="Always" />
-    <EmbeddedResource Include="thumb.png" Condition="Exists('thumb.png')" />
+    <None Include="thumb.png" CopyToOutputDirectory="Always" Condition="Exists('thumb.png')" />
   </ItemGroup>
 
   <!--

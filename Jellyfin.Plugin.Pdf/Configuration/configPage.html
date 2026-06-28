@@ -61,8 +61,10 @@
             .addEventListener('pagebeforeshow', function () {
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
-                    document.querySelector('#RenderResolutionDpi').value = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : 150;
-                    document.querySelector('#ThumbnailPaddingMode').value = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : 0;
+                    var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
+                    var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
+                    document.querySelector('#RenderResolutionDpi').value = (dpi != null) ? dpi : 150;
+                    document.querySelector('#ThumbnailPaddingMode').value = (padding != null) ? padding : 'White';
                     Dashboard.hideLoadingMsg();
                 });
             });
@@ -71,8 +73,10 @@
             .addEventListener('submit', function (e) {
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(PdfThumbnailsConfig.pluginUniqueId).then(function (config) {
-                    config.RenderResolutionDpi = parseInt(document.querySelector('#RenderResolutionDpi').value) || 150;
-                    config.ThumbnailPaddingMode = document.querySelector('#ThumbnailPaddingMode').value;
+                    var dpiKey = (config.RenderResolutionDpi !== undefined) ? 'RenderResolutionDpi' : 'renderResolutionDpi';
+                    var paddingKey = (config.ThumbnailPaddingMode !== undefined) ? 'ThumbnailPaddingMode' : 'thumbnailPaddingMode';
+                    config[dpiKey] = parseInt(document.querySelector('#RenderResolutionDpi').value) || 150;
+                    config[paddingKey] = document.querySelector('#ThumbnailPaddingMode').value;
                     ApiClient.updatePluginConfiguration(PdfThumbnailsConfig.pluginUniqueId, config).then(function () {
                         Dashboard.processPluginConfigurationUpdateResult();
                     });

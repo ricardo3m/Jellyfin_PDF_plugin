@@ -4,6 +4,7 @@
   "description": "This plugin automatically generates thumbnail images for PDF files in your Jellyfin library by rendering the first page of each PDF. Supports configurable render resolution (DPI) for quality control.",
   "guid": "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c",
   "imageUrl": null,
+  "imagePath": "thumb.png",
   "name": "PDF Thumbnails",
   "overview": "Generates thumbnail images from the first page of PDF files.",
   "owner": "ricardo3m",

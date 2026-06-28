@@ -23,6 +23,8 @@
   <!-- Background -->
   <rect width="256" height="256" rx="24" fill="url(#bgGrad)"/>
 
+  <!-- Document content scaled down to leave padding (prevents card crop from cutting edges) -->
+  <g transform="translate(128,136) scale(0.72) translate(-128,-136)">
   <!-- Document (with shadow via filter) -->
   <g filter="url(#docShadow)">
     <path d="M57 43 L163 43 L199 79 L199 223 Q199 230 192 230 L64 230 Q57 230 57 223 Z"
@@ -77,4 +79,5 @@
   <rect x="168" y="82" width="24" height="18" rx="3" fill="#e63946"/>
   <polygon points="170,98 178,88 184,93 188,88 190,98" fill="white" opacity="0.8"/>
   <circle cx="172" cy="87" r="2.5" fill="white" opacity="0.8"/>
+  </g>
 </svg>

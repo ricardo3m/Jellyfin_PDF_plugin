@@ -4,6 +4,20 @@
         <name>Jellyfin.Plugin.Pdf</name>
     </assembly>
     <members>
+        <member name="T:Jellyfin.Plugin.Pdf.Configuration.PaddingMode">
+            <summary>
+            Controls the padding added around the rendered PDF page to produce a square thumbnail.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.PaddingMode.White">
+            <summary>Fill empty space with white.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.PaddingMode.Transparent">
+            <summary>Fill empty space with transparency (PNG only).</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.PaddingMode.None">
+            <summary>Do not add any padding; output the page at its original aspect ratio.</summary>
+        </member>
         <member name="T:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration">
             <summary>
             Plugin configuration.
@@ -13,6 +27,11 @@
             <summary>
             Gets or sets the DPI used when rendering PDF pages as thumbnails.
             Valid range: 36–600. Values outside this range are clamped.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.ThumbnailPaddingMode">
+            <summary>
+            Gets or sets the padding mode applied when squaring the thumbnail.
             </summary>
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.NativeLibraryLoader">
