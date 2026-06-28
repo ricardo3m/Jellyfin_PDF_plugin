@@ -15,7 +15,7 @@ A plugin for [Jellyfin](https://jellyfin.org/) that automatically generates thum
 
 ### Manual Installation
 
-1. Download the latest release zip from the [Releases](../../releases) page.
+1. Download the latest release zip from the [Releases](https://github.com/ricardo3m/Jellyfin_PDF_plugin/releases) page.
 2. Extract all files into a new folder inside your Jellyfin plugins directory:
    ```
    <Jellyfin Data Path>/plugins/Jellyfin_PDF_plugin/
