@@ -1,7 +1,7 @@
 {
   "category": "General",
-  "changelog": "Initial release\n- PDF first-page thumbnail generation\n- Configurable render resolution (DPI)",
-  "description": "This plugin automatically generates thumbnail images for PDF files in your Jellyfin library by rendering the first page of each PDF. Supports configurable render resolution (DPI) for quality control.",
+  "changelog": "Initial release\n- PDF first-page thumbnail generation\n- Configurable render resolution (DPI)\n- Configurable thumbnail padding mode (white, transparent, no padding)",
+  "description": "Automatically generates cover thumbnails for PDF files in your Jellyfin library by rendering the first page of each PDF. Supports configurable render resolution (DPI) and thumbnail padding mode.",
   "guid": "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c",
   "imageUrl": null,
   "imagePath": "thumb.png",
@@ -9,6 +9,6 @@
   "overview": "Generates thumbnail images from the first page of PDF files.",
   "owner": "ricardo3m",
   "targetAbi": "10.11.0.0",
-  "timestamp": "2024-01-01T00:00:00Z",
+  "timestamp": "2026-06-28T00:00:00Z",
   "version": "1.0.0.0"
 }
