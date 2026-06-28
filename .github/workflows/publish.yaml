@@ -46,6 +46,7 @@ jobs:
           popd
 
           echo "ARTIFACT=./artifacts/${ZIPNAME}" >> "$GITHUB_ENV"
+          echo "FILENAME=${ZIPNAME}" >> "$GITHUB_ENV"
 
       - name: Create GitHub Release and upload zip
         uses: softprops/action-gh-release@v2
@@ -54,19 +55,65 @@ jobs:
           generate_release_notes: true
 
       - name: Update manifest.json
-        env:
-          PIP_BREAK_SYSTEM_PACKAGES: '1'
         run: |
-          pip install --quiet jprm
+          python3 - <<'EOF'
+          import json, hashlib, sys, os
+          from datetime import datetime, timezone
 
-          FILENAME="$(basename "${{ env.ARTIFACT }}")"
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${FILENAME}"
+          artifact  = os.environ['ARTIFACT']
+          dl_url    = os.environ['DOWNLOAD_URL']
+          meta_path = 'Jellyfin.Plugin.Pdf/meta.json'
+          manifest_path = 'manifest.json'
 
-          if [ ! -f manifest.json ]; then
-            jprm repo init .
-          fi
+          # MD5 checksum (Jellyfin requirement)
+          h = hashlib.md5()
+          with open(artifact, 'rb') as f:
+              for chunk in iter(lambda: f.read(8192), b''):
+                  h.update(chunk)
+          checksum = h.hexdigest()
 
-          jprm repo add --url "${DOWNLOAD_URL}" . "${{ env.ARTIFACT }}"
+          with open(meta_path) as f:
+              meta = json.load(f)
+
+          try:
+              with open(manifest_path) as f:
+                  manifest = json.load(f)
+          except (FileNotFoundError, json.JSONDecodeError):
+              manifest = []
+
+          plugin = next((p for p in manifest if p['guid'] == meta['guid']), None)
+          if plugin is None:
+              plugin = {
+                  'guid': meta['guid'],
+                  'name': meta['name'],
+                  'description': meta['description'],
+                  'overview': meta['overview'],
+                  'owner': meta['owner'],
+                  'category': meta['category'],
+                  'imageUrl': meta.get('imageUrl'),
+                  'versions': []
+              }
+              manifest.append(plugin)
+
+          new_version = {
+              'version': meta['version'],
+              'changelog': meta['changelog'],
+              'targetAbi': meta['targetAbi'],
+              'sourceUrl': dl_url,
+              'checksum': checksum,
+              'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
+          }
+          plugin['versions'] = [v for v in plugin['versions'] if v['version'] != meta['version']]
+          plugin['versions'].insert(0, new_version)
+
+          with open(manifest_path, 'w') as f:
+              json.dump(manifest, f, indent=4)
+
+          print(f"Manifest updated: version={meta['version']} url={dl_url} checksum={checksum}")
+          EOF
+        env:
+          ARTIFACT: ${{ env.ARTIFACT }}
+          DOWNLOAD_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ env.FILENAME }}
 
       - name: Commit and push manifest
         run: |
