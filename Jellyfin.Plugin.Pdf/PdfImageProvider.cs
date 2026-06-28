@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -42,9 +43,12 @@ public class PdfImageProvider : IRemoteImageProvider
     public string Name => "PDF Thumbnail Provider";
 
     /// <inheritdoc />
-    public bool Supports(BaseItem item)
-        => !string.IsNullOrEmpty(item?.Path) &&
-           Path.GetExtension(item.Path).Equals(".pdf", StringComparison.OrdinalIgnoreCase);
+    /// <remarks>
+    /// Returns true for all <see cref="Book"/> items so that the provider
+    /// appears in the library settings UI. PDF-only filtering is done in
+    /// <see cref="GetImages"/> to avoid blocking other book types.
+    /// </remarks>
+    public bool Supports(BaseItem item) => item is Book;
 
     /// <inheritdoc />
     public IEnumerable<ImageType> GetSupportedImages(BaseItem item)
@@ -60,6 +64,12 @@ public class PdfImageProvider : IRemoteImageProvider
     /// </remarks>
     public Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(item.Path) ||
+            !Path.GetExtension(item.Path).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            return Task.FromResult(Enumerable.Empty<RemoteImageInfo>());
+        }
+
         var results = new List<RemoteImageInfo>
         {
             new RemoteImageInfo

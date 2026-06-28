@@ -46,6 +46,11 @@
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.Supports(MediaBrowser.Controller.Entities.BaseItem)">
             <inheritdoc />
+            <remarks>
+            Returns true for all <see cref="T:MediaBrowser.Controller.Entities.Book"/> items so that the provider
+            appears in the library settings UI. PDF-only filtering is done in
+            <see cref="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImages(MediaBrowser.Controller.Entities.BaseItem,System.Threading.CancellationToken)"/> to avoid blocking other book types.
+            </remarks>
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetSupportedImages(MediaBrowser.Controller.Entities.BaseItem)">
             <inheritdoc />
