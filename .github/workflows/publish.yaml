@@ -16,17 +16,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build plugin with JPRM
-        id: jprm
-        uses: oddstr13/jellyfin-plugin-repository-manager@master
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          path: .
-          output: ./artifacts
+          dotnet-version: '9.0.x'
+
+      - name: Publish plugin
+        run: |
+          dotnet publish Jellyfin.Plugin.Pdf/Jellyfin.Plugin.Pdf.csproj \
+            -c Release \
+            --output ./publish_output \
+            --nologo
+
+      - name: Package plugin zip
+        run: |
+          mkdir -p ./artifacts
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          ZIPNAME="jellyfin-plugin-pdf_${VERSION}.zip"
+
+          pushd ./publish_output
+          zip -r "../artifacts/${ZIPNAME}" \
+            Jellyfin.Plugin.Pdf.dll \
+            PDFtoImage.dll \
+            SkiaSharp.dll \
+            meta.json \
+            thumb.png \
+            runtimes/
+          popd
+
+          echo "ARTIFACT=./artifacts/${ZIPNAME}" >> "$GITHUB_ENV"
 
       - name: Create GitHub Release and upload zip
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.jprm.outputs.artifact }}
+          files: ${{ env.ARTIFACT }}
           generate_release_notes: true
 
       - name: Update manifest.json
@@ -35,19 +59,24 @@ jobs:
         run: |
           pip install --quiet jprm
 
-          ARTIFACT="${{ steps.jprm.outputs.artifact }}"
-          FILENAME="$(basename "${ARTIFACT}")"
+          FILENAME="$(basename "${{ env.ARTIFACT }}")"
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${FILENAME}"
 
-          # Initialise the manifest on the very first release
           if [ ! -f manifest.json ]; then
             jprm repo init .
           fi
 
-          jprm repo add --url "${DOWNLOAD_URL}" . "${ARTIFACT}"
+          jprm repo add --url "${DOWNLOAD_URL}" . "${{ env.ARTIFACT }}"
 
       - name: Commit and push manifest
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git diff --staged --quiet && echo "manifest unchanged" && exit 0
+          git commit -m "chore: update manifest for ${{ github.ref_name }}"
+          git push origin HEAD:${{ github.event.repository.default_branch }}
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest.json
