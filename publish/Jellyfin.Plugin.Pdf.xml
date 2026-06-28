@@ -29,7 +29,9 @@
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.PdfImageProvider">
             <summary>
-            Provides thumbnail images for PDF files by rendering the first page.
+            Provides cover images for PDF files by rendering the first page.
+            Implements <see cref="T:MediaBrowser.Controller.Providers.IRemoteImageProvider"/> so it appears in Jellyfin's
+            library "Image fetchers" settings and is invoked during metadata refresh scans.
             </summary>
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.#ctor(Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.Pdf.PdfImageProvider})">
@@ -40,6 +42,7 @@
         </member>
         <member name="P:Jellyfin.Plugin.Pdf.PdfImageProvider.Name">
             <inheritdoc />
+            <remarks>This name appears in the library's "Image fetchers" settings page.</remarks>
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.Supports(MediaBrowser.Controller.Entities.BaseItem)">
             <inheritdoc />
@@ -47,8 +50,21 @@
         <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetSupportedImages(MediaBrowser.Controller.Entities.BaseItem)">
             <inheritdoc />
         </member>
-        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImage(MediaBrowser.Controller.Entities.BaseItem,MediaBrowser.Model.Entities.ImageType,System.Threading.CancellationToken)">
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImages(MediaBrowser.Controller.Entities.BaseItem,System.Threading.CancellationToken)">
             <inheritdoc />
+            <remarks>
+            Called during metadata refresh. Returns a pseudo-URL that encodes the
+            local PDF path; <see cref="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImageResponse(System.String,System.Threading.CancellationToken)"/> intercepts this URL and
+            renders the PDF instead of making an HTTP request.
+            </remarks>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImageResponse(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+            <remarks>
+            Intercepts the pseudo-URL produced by <see cref="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetImages(MediaBrowser.Controller.Entities.BaseItem,System.Threading.CancellationToken)"/>, renders the
+            first page of the PDF with PDFtoImage/SkiaSharp, and returns the JPEG bytes
+            wrapped in a fake <see cref="T:System.Net.Http.HttpResponseMessage"/> — no network call is made.
+            </remarks>
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.PdfThumbnailGenerator">
             <summary>
