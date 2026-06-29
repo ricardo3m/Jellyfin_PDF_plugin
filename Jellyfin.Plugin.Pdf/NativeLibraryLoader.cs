@@ -44,11 +44,12 @@ internal static class NativeLibraryLoader
         // Try arch-specific RID first (e.g. linux-x64), then OS-only (e.g. osx for universal binaries)
         var rids = new[] { $"{os}-{arch}", os };
 
-        // Map P/Invoke library name → renamed native file name
+        // Map P/Invoke library name → renamed native file name.
+        // Note: libSkiaSharp is intentionally excluded — the plugin uses Jellyfin's
+        // bundled SkiaSharp to avoid cross-context type conflicts.
         var libs = new (string PInvokeName, string FileName)[]
         {
-            ("libSkiaSharp", GetNativeFileName(os, "libSkiaSharp")),
-            ("pdfium",       GetNativeFileName(os, "pdfium")),
+            ("pdfium", GetNativeFileName(os, "pdfium")),
         };
 
         foreach (var (pinvokeName, fileName) in libs)
@@ -68,8 +69,7 @@ internal static class NativeLibraryLoader
     private static void TryRegisterResolver(Assembly assembly)
     {
         var name = assembly.GetName().Name ?? string.Empty;
-        if (!name.Contains("SkiaSharp", StringComparison.OrdinalIgnoreCase)
-            && !name.Contains("Pdfium", StringComparison.OrdinalIgnoreCase)
+        if (!name.Contains("Pdfium", StringComparison.OrdinalIgnoreCase)
             && !name.Contains("PDFtoImage", StringComparison.OrdinalIgnoreCase))
         {
             return;

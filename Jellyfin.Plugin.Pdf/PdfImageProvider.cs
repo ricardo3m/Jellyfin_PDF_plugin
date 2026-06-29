@@ -125,8 +125,11 @@ public class PdfImageProvider : IRemoteImageProvider
                     options: renderOptions);
             }
 
-            pageStream.Position = 0;
-            using var pageBitmap = SKBitmap.Decode(pageStream);
+            // Decode via byte array to avoid SKManagedStream (which wraps a .NET Stream
+            // with native callbacks). SKManagedStream finalizers can cause an
+            // InvalidCastException when the GC finalizer thread crosses assembly contexts.
+            var pageBytes = pageStream.ToArray();
+            using var pageBitmap = SKBitmap.Decode(pageBytes);
 
             var memoryStream = new MemoryStream();
 

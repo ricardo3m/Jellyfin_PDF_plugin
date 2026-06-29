@@ -7,6 +7,8 @@
     <NoWarn>CA1416;CA2255</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Jellyfin.Plugin.Pdf</RootNamespace>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +18,20 @@
     <PackageReference Include="Jellyfin.Model" Version="10.11.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="PDFtoImage" Version="5.2.1" />
+    <!--
+      PDFtoImage 5.0.0 uses SkiaSharp >= 3.116.1, which matches Jellyfin's bundled
+      SkiaSharp (assembly 3.116.0.0). Versions 5.1+ require SkiaSharp >= 3.119.0
+      which conflicts with Jellyfin's SkiaSharp and causes a fatal InvalidCastException.
+    -->
+    <PackageReference Include="PDFtoImage" Version="5.0.0" />
+    <!--
+      Exclude SkiaSharp's managed DLL and native assets from the plugin output.
+      The plugin must use Jellyfin's own SkiaSharp to avoid cross-context type
+      conflicts (InvalidCastException in GC finalizer thread).
+    -->
+    <PackageReference Include="SkiaSharp" Version="3.116.1">
+      <ExcludeAssets>runtime;native</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
