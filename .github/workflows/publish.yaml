@@ -39,7 +39,6 @@ jobs:
           zip -r "../artifacts/${ZIPNAME}" \
             Jellyfin.Plugin.Pdf.dll \
             PDFtoImage.dll \
-            SkiaSharp.dll \
             meta.json \
             thumb.png \
             runtimes/
