@@ -79,4 +79,4 @@ Pull requests and issues are welcome. Please open an issue before starting signi
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://github.com/ricardo3m/Jellyfin_PDF_plugin/blob/main/LICENSE).
