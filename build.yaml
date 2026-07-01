@@ -1,6 +1,6 @@
 name: "PDF Thumbnails"
 guid: "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c"
-version: "1.0.2.0"
+version: "1.0.3.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 overview: "Generates thumbnail images from the first page of PDF files."
@@ -14,8 +14,8 @@ artifacts:
   - "Jellyfin.Plugin.Pdf.dll"
   - "PDFtoImage.dll"
 changelog: |-
-  - Fix fatal crash: plugin no longer bundles native libSkiaSharp
-  - Exclude transitive SkiaSharp.NativeAssets.* packages pulled in by PDFtoImage
-  - This removes the libSkiaSharp binaries that shadowed Jellyfin's own copy and
-    caused "native libSkiaSharp library (119.0) is incompatible" errors that broke
-    all image processing in Jellyfin
+  - Fix: avoid blocking Jellyfin's thread pool during PDF rendering
+  - GetImageResponse now offloads synchronous PDF rendering to Task.Run
+  - EnsureThumbnailExistsAsync is now properly async (was fake-async)
+  - PDF rendering now respects CancellationToken
+  - Fix: pageStream MemoryStream is now properly disposed after use

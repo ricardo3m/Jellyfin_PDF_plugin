@@ -25,7 +25,7 @@ public sealed class PdfThumbnailGenerator
     /// <param name="thumbnailPath">Path where the thumbnail should be saved.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True if a thumbnail was generated; false if one already existed.</returns>
-    public Task<bool> EnsureThumbnailExistsAsync(
+    public async Task<bool> EnsureThumbnailExistsAsync(
         string pdfPath,
         string thumbnailPath,
         CancellationToken cancellationToken = default)
@@ -42,7 +42,7 @@ public sealed class PdfThumbnailGenerator
 
         if (File.Exists(thumbnailPath))
         {
-            return Task.FromResult(false);
+            return false;
         }
 
         if (!File.Exists(pdfPath))
@@ -58,20 +58,24 @@ public sealed class PdfThumbnailGenerator
 
         var extension = Path.GetExtension(thumbnailPath);
         var usePng = extension.Equals(".png", StringComparison.OrdinalIgnoreCase);
-
         var renderOptions = new RenderOptions(Dpi: _options.RenderResolutionDpi);
 
-        using var pdfStream = File.OpenRead(pdfPath);
-
-        if (usePng)
+        await Task.Run(() =>
         {
-            Conversion.SavePng(thumbnailPath, pdfStream, page: 0, leaveOpen: false, password: null, options: renderOptions);
-        }
-        else
-        {
-            Conversion.SaveJpeg(thumbnailPath, pdfStream, page: 0, leaveOpen: false, password: null, options: renderOptions);
-        }
+            cancellationToken.ThrowIfCancellationRequested();
 
-        return Task.FromResult(true);
+            using var pdfStream = File.OpenRead(pdfPath);
+
+            if (usePng)
+            {
+                Conversion.SavePng(thumbnailPath, pdfStream, page: (Index)0, leaveOpen: false, password: null, options: renderOptions);
+            }
+            else
+            {
+                Conversion.SaveJpeg(thumbnailPath, pdfStream, page: (Index)0, leaveOpen: false, password: null, options: renderOptions);
+            }
+        }, cancellationToken).ConfigureAwait(false);
+
+        return true;
     }
 }

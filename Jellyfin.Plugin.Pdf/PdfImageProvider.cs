@@ -90,11 +90,11 @@ public class PdfImageProvider : IRemoteImageProvider
     /// first page of the PDF with PDFtoImage/SkiaSharp, and returns the JPEG bytes
     /// wrapped in a fake <see cref="HttpResponseMessage"/> — no network call is made.
     /// </remarks>
-    public Task<HttpResponseMessage> GetImageResponse(string url, CancellationToken cancellationToken)
+    public async Task<HttpResponseMessage> GetImageResponse(string url, CancellationToken cancellationToken)
     {
         if (!url.StartsWith(UrlPrefix, StringComparison.Ordinal))
         {
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest));
+            return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
         var pdfPath = Uri.UnescapeDataString(url[UrlPrefix.Length..]);
@@ -102,7 +102,7 @@ public class PdfImageProvider : IRemoteImageProvider
         if (!File.Exists(pdfPath))
         {
             _logger.LogWarning("PDF file not found: {Path}", pdfPath);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
 
         try
@@ -110,63 +110,78 @@ public class PdfImageProvider : IRemoteImageProvider
             var config = Plugin.Instance?.Configuration;
             var dpi = config?.RenderResolutionDpi ?? 150;
             var paddingMode = config?.ThumbnailPaddingMode ?? Configuration.PaddingMode.White;
-            var renderOptions = new RenderOptions(Dpi: dpi);
 
-            // Render the first PDF page to an in-memory bitmap.
-            var pageStream = new MemoryStream();
-            using (var pdfStream = File.OpenRead(pdfPath))
+            var memoryStream = await Task.Run(() =>
             {
-                Conversion.SavePng(
-                    pageStream,
-                    pdfStream,
-                    page: 0,
-                    leaveOpen: false,
-                    password: null,
-                    options: renderOptions);
-            }
+                cancellationToken.ThrowIfCancellationRequested();
 
-            // Decode via byte array to avoid SKManagedStream (which wraps a .NET Stream
-            // with native callbacks). SKManagedStream finalizers can cause an
-            // InvalidCastException when the GC finalizer thread crosses assembly contexts.
-            var pageBytes = pageStream.ToArray();
-            using var pageBitmap = SKBitmap.Decode(pageBytes);
+                var renderOptions = new RenderOptions(Dpi: dpi);
 
-            var memoryStream = new MemoryStream();
+                // Render the first PDF page to an in-memory bitmap.
+                byte[] pageBytes;
+                using (var pageStream = new MemoryStream())
+                using (var pdfStream = File.OpenRead(pdfPath))
+                {
+                    Conversion.SavePng(
+                        pageStream,
+                        pdfStream,
+                        page: (Index)0,
+                        leaveOpen: false,
+                        password: null,
+                        options: renderOptions);
 
-            if (paddingMode == Configuration.PaddingMode.None)
-            {
-                // No padding: output the page at its original aspect ratio.
-                pageBitmap.Encode(memoryStream, SKEncodedImageFormat.Png, 100);
-            }
-            else
-            {
-                var side = Math.Max(pageBitmap.Width, pageBitmap.Height);
-                var fillColor = paddingMode == Configuration.PaddingMode.White
-                    ? SKColors.White
-                    : SKColors.Transparent;
+                    // Decode via byte array to avoid SKManagedStream (which wraps a .NET Stream
+                    // with native callbacks). SKManagedStream finalizers can cause an
+                    // InvalidCastException when the GC finalizer thread crosses assembly contexts.
+                    pageBytes = pageStream.ToArray();
+                }
 
-                using var squareBitmap = new SKBitmap(side, side, SKColorType.Rgba8888, SKAlphaType.Premul);
-                using var canvas = new SKCanvas(squareBitmap);
-                canvas.Clear(fillColor);
-                canvas.DrawBitmap(
-                    pageBitmap,
-                    (side - pageBitmap.Width) / 2f,
-                    (side - pageBitmap.Height) / 2f);
-                canvas.Flush();
-                squareBitmap.Encode(memoryStream, SKEncodedImageFormat.Png, 100);
-            }
+                cancellationToken.ThrowIfCancellationRequested();
 
-            memoryStream.Position = 0;
+                using var pageBitmap = SKBitmap.Decode(pageBytes);
+
+                var result = new MemoryStream();
+
+                if (paddingMode == Configuration.PaddingMode.None)
+                {
+                    // No padding: output the page at its original aspect ratio.
+                    pageBitmap.Encode(result, SKEncodedImageFormat.Png, 100);
+                }
+                else
+                {
+                    var side = Math.Max(pageBitmap.Width, pageBitmap.Height);
+                    var fillColor = paddingMode == Configuration.PaddingMode.White
+                        ? SKColors.White
+                        : SKColors.Transparent;
+
+                    using var squareBitmap = new SKBitmap(side, side, SKColorType.Rgba8888, SKAlphaType.Premul);
+                    using var canvas = new SKCanvas(squareBitmap);
+                    canvas.Clear(fillColor);
+                    canvas.DrawBitmap(
+                        pageBitmap,
+                        (side - pageBitmap.Width) / 2f,
+                        (side - pageBitmap.Height) / 2f);
+                    canvas.Flush();
+                    squareBitmap.Encode(result, SKEncodedImageFormat.Png, 100);
+                }
+
+                result.Position = 0;
+                return result;
+            }, cancellationToken).ConfigureAwait(false);
 
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Content = new StreamContent(memoryStream);
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-            return Task.FromResult(response);
+            return response;
+        }
+        catch (OperationCanceledException)
+        {
+            return new HttpResponseMessage(HttpStatusCode.NoContent);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating cover for PDF: {Path}", pdfPath);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
         }
     }
 }

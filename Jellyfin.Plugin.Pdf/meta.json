@@ -1,6 +1,6 @@
 {
   "category": "General",
-  "changelog": "Fix: plugin no longer bundles native libSkiaSharp\n- Exclude transitive SkiaSharp.NativeAssets.* packages pulled in by PDFtoImage\n- Removes libSkiaSharp binaries that shadowed Jellyfin's own copy and caused a fatal 'native libSkiaSharp library (119.0) is incompatible' crash breaking all image processing",
+  "changelog": "Fix: avoid blocking Jellyfin's thread pool during PDF rendering\n- GetImageResponse now offloads synchronous PDF rendering (PDFtoImage/SkiaSharp) to Task.Run so ASP.NET thread pool threads are never blocked\n- EnsureThumbnailExistsAsync is now properly async (was fake-async, blocking caller thread)\n- PDF rendering now respects CancellationToken; requests cancelled by Jellyfin abort early\n- Fix: pageStream MemoryStream is now properly disposed after use",
   "description": "Automatically generates cover thumbnails for PDF files in your Jellyfin library by rendering the first page of each PDF. Supports configurable render resolution (DPI) and thumbnail padding mode.",
   "guid": "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c",
   "imageUrl": null,
@@ -10,5 +10,5 @@
   "owner": "ricardo3m",
   "targetAbi": "10.11.0.0",
   "timestamp": "2026-07-01T00:00:00Z",
-  "version": "1.0.2.0"
+  "version": "1.0.3.0"
 }
