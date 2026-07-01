@@ -1,6 +1,6 @@
 name: "PDF Thumbnails"
 guid: "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c"
-version: "1.0.1.0"
+version: "1.0.2.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 overview: "Generates thumbnail images from the first page of PDF files."
@@ -14,7 +14,8 @@ artifacts:
   - "Jellyfin.Plugin.Pdf.dll"
   - "PDFtoImage.dll"
 changelog: |-
-  - Fix SkiaSharp version conflict causing fatal crash
-  - Downgrade PDFtoImage to 5.0.0 (compatible with Jellyfin's SkiaSharp 3.116)
-  - Exclude SkiaSharp from plugin bundle; use Jellyfin's copy
-  - Use byte array decode to eliminate SKManagedStream finalizer risk
+  - Fix fatal crash: plugin no longer bundles native libSkiaSharp
+  - Exclude transitive SkiaSharp.NativeAssets.* packages pulled in by PDFtoImage
+  - This removes the libSkiaSharp binaries that shadowed Jellyfin's own copy and
+    caused "native libSkiaSharp library (119.0) is incompatible" errors that broke
+    all image processing in Jellyfin

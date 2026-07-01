@@ -7,8 +7,8 @@
     <NoWarn>CA1416;CA2255</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Jellyfin.Plugin.Pdf</RootNamespace>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +32,21 @@
     <PackageReference Include="SkiaSharp" Version="3.116.1">
       <ExcludeAssets>runtime;native</ExcludeAssets>
     </PackageReference>
+    <!--
+      CRITICAL: PDFtoImage transitively references the SkiaSharp.NativeAssets.*
+      packages, which copy native libSkiaSharp binaries into the plugin's
+      runtimes/ folder and register them in the plugin's deps.json. Those native
+      binaries shadow Jellyfin's own libSkiaSharp and cause a fatal version
+      mismatch (e.g. "native libSkiaSharp library (119.0) is incompatible ...
+      Supported versions ... [116.0, 117.0)"), which breaks ALL of Jellyfin's
+      image processing. Excluding all assets from these packages prevents the
+      native libSkiaSharp files (and their deps.json entries) from ever shipping
+      with the plugin. SkiaSharp managed is provided at runtime by Jellyfin.
+    -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="3.116.1" ExcludeAssets="all" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" ExcludeAssets="all" />
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="3.116.1" ExcludeAssets="all" />
+    <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.116.1" ExcludeAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,15 +62,24 @@
   <!--
     Rename native libraries to a non-.dll extension after build and publish.
     Jellyfin's PluginManager scans all *.dll files recursively in the plugin folder
-    and tries to load them as managed assemblies. Native DLLs (libSkiaSharp, pdfium)
-    cause a BadImageFormatException which disables the entire plugin.
+    and tries to load them as managed assemblies. Native DLLs (pdfium) cause a
+    BadImageFormatException which disables the entire plugin.
     NativeLibraryLoader.cs loads the renamed files via NativeLibrary.Load() at runtime.
+
+    libSkiaSharp is NEVER shipped by this plugin (the SkiaSharp.NativeAssets.*
+    packages are excluded above); any stray copy is deleted here as a safety net so
+    it can never conflict with Jellyfin's own libSkiaSharp.
   -->
   <Target Name="RenameNativeLibsAfterBuild" AfterTargets="Build">
     <ItemGroup>
+      <_StraySkiaBuild Include="$(OutputPath)runtimes\**\native\libSkiaSharp.*" />
+    </ItemGroup>
+    <Delete Files="@(_StraySkiaBuild)" Condition="'@(_StraySkiaBuild)' != ''" />
+    <ItemGroup>
       <_NativeLibs Include="$(OutputPath)runtimes\**\native\*.dll;
                             $(OutputPath)runtimes\**\native\*.dylib;
-                            $(OutputPath)runtimes\**\native\*.so" />
+                            $(OutputPath)runtimes\**\native\*.so"
+                   Exclude="$(OutputPath)runtimes\**\native\libSkiaSharp.*" />
     </ItemGroup>
     <Move SourceFiles="@(_NativeLibs)"
           DestinationFiles="@(_NativeLibs->'%(Identity).native')"
@@ -64,9 +88,14 @@
 
   <Target Name="RenameNativeLibsAfterPublish" AfterTargets="Publish">
     <ItemGroup>
+      <_StraySkiaPublish Include="$(PublishDir)runtimes\**\native\libSkiaSharp.*" />
+    </ItemGroup>
+    <Delete Files="@(_StraySkiaPublish)" Condition="'@(_StraySkiaPublish)' != ''" />
+    <ItemGroup>
       <_PublishedNativeLibs Include="$(PublishDir)runtimes\**\native\*.dll;
                                      $(PublishDir)runtimes\**\native\*.dylib;
-                                     $(PublishDir)runtimes\**\native\*.so" />
+                                     $(PublishDir)runtimes\**\native\*.so"
+                            Exclude="$(PublishDir)runtimes\**\native\libSkiaSharp.*" />
     </ItemGroup>
     <Move SourceFiles="@(_PublishedNativeLibs)"
           DestinationFiles="@(_PublishedNativeLibs->'%(Identity).native')"

@@ -1,6 +1,6 @@
 {
   "category": "General",
-  "changelog": "Fix: SkiaSharp version conflict causing fatal crash\n- Downgrade PDFtoImage to 5.0.0 (uses SkiaSharp 3.116.x compatible with Jellyfin)\n- Exclude SkiaSharp from plugin bundle; use Jellyfin's copy to avoid cross-context type conflicts\n- Use byte array decode path to eliminate SKManagedStream finalizer risk",
+  "changelog": "Fix: plugin no longer bundles native libSkiaSharp\n- Exclude transitive SkiaSharp.NativeAssets.* packages pulled in by PDFtoImage\n- Removes libSkiaSharp binaries that shadowed Jellyfin's own copy and caused a fatal 'native libSkiaSharp library (119.0) is incompatible' crash breaking all image processing",
   "description": "Automatically generates cover thumbnails for PDF files in your Jellyfin library by rendering the first page of each PDF. Supports configurable render resolution (DPI) and thumbnail padding mode.",
   "guid": "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c",
   "imageUrl": null,
@@ -9,6 +9,6 @@
   "overview": "Generates thumbnail images from the first page of PDF files.",
   "owner": "ricardo3m",
   "targetAbi": "10.11.0.0",
-  "timestamp": "2026-06-29T00:00:00Z",
-  "version": "1.0.1.0"
+  "timestamp": "2026-07-01T00:00:00Z",
+  "version": "1.0.2.0"
 }
