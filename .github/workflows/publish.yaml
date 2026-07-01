@@ -47,11 +47,26 @@ jobs:
           echo "ARTIFACT=./artifacts/${ZIPNAME}" >> "$GITHUB_ENV"
           echo "FILENAME=${ZIPNAME}" >> "$GITHUB_ENV"
 
+      - name: Extract changelog from meta.json
+        run: |
+          python3 - <<'EOF'
+          import json, os
+          with open('Jellyfin.Plugin.Pdf/meta.json') as f:
+              meta = json.load(f)
+          changelog = meta.get('changelog', '')
+          # Write to GITHUB_ENV as a multiline value
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write('RELEASE_BODY<<EOF_CHANGELOG\n')
+              env.write(changelog + '\n')
+              env.write('EOF_CHANGELOG\n')
+          EOF
+
       - name: Create GitHub Release and upload zip
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.ARTIFACT }}
-          generate_release_notes: true
+          body: ${{ env.RELEASE_BODY }}
+          generate_release_notes: false
 
       - name: Update manifest.json
         run: |
