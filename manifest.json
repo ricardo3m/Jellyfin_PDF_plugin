@@ -9,6 +9,14 @@
         "imageUrl": null,
         "versions": [
             {
+                "version": "1.0.3.0",
+                "changelog": "Fix: avoid blocking Jellyfin's thread pool during PDF rendering\n- GetImageResponse now offloads synchronous PDF rendering (PDFtoImage/SkiaSharp) to Task.Run so ASP.NET thread pool threads are never blocked\n- EnsureThumbnailExistsAsync is now properly async (was fake-async, blocking caller thread)\n- PDF rendering now respects CancellationToken; requests cancelled by Jellyfin abort early\n- Fix: pageStream MemoryStream is now properly disposed after use",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/ricardo3m/Jellyfin_PDF_plugin/releases/download/v1.0.3.0/jellyfin-plugin-pdf_1.0.3.0.zip",
+                "checksum": "7b2c085aefd0d03f9c2f8d37be922577",
+                "timestamp": "2026-07-01T20:10:00Z"
+            },
+            {
                 "version": "1.0.2.0",
                 "changelog": "Fix: plugin no longer bundles native libSkiaSharp\n- Exclude transitive SkiaSharp.NativeAssets.* packages pulled in by PDFtoImage\n- Removes the libSkiaSharp binaries that shadowed Jellyfin's own copy and caused a fatal 'native libSkiaSharp library (119.0) is incompatible' crash that broke all image processing in Jellyfin",
                 "targetAbi": "10.11.0.0",
