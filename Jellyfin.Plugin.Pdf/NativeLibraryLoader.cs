@@ -64,6 +64,10 @@ internal static class NativeLibraryLoader
         AppDomain.CurrentDomain.AssemblyLoad += (_, e) => TryRegisterResolver(e.LoadedAssembly);
         foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             TryRegisterResolver(asm);
+
+        // Remove runtime folders that don't belong to this platform. The zip ships all
+        // platform binaries; this one-time cleanup reclaims the disk space on first load.
+        PruneUnusedRuntimes(assemblyDir, rids);
     }
 
     private static void TryRegisterResolver(Assembly assembly)
@@ -105,6 +109,23 @@ internal static class NativeLibraryLoader
             "osx" => $"{baseName}.dylib.native",
             _     => $"{baseName}.so.native",
         };
+    }
+
+    private static void PruneUnusedRuntimes(string baseDir, string[] ridsToKeep)
+    {
+        var runtimesDir = Path.Combine(baseDir, "runtimes");
+        if (!Directory.Exists(runtimesDir))
+            return;
+
+        foreach (var dir in Directory.GetDirectories(runtimesDir))
+        {
+            var rid = Path.GetFileName(dir);
+            if (Array.Exists(ridsToKeep, r => string.Equals(r, rid, StringComparison.OrdinalIgnoreCase)))
+                continue;
+
+            try { Directory.Delete(dir, recursive: true); }
+            catch { /* Best-effort — ignore permission errors or locked files. */ }
+        }
     }
 
     private static IntPtr TryLoad(string baseDir, string[] rids, string fileName)
