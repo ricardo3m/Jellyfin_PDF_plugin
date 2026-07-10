@@ -9,6 +9,14 @@
         "imageUrl": null,
         "versions": [
             {
+                "version": "1.0.4.0",
+                "changelog": "Feature: extract the embedded image directly when a PDF's first page is just a single full-page image (e.g. a scanned cover), instead of rasterizing it\n- Pages that also contain text or other content are still rendered normally so nothing is lost\n- Extracted images are rotated according to the page's /Rotate value to avoid upside-down covers\nFix: rendered thumbnails now embed pixel-density (DPI) metadata so image viewers report the configured render resolution instead of always defaulting to 96 DPI\n- Increase maximum configurable render resolution from 600 to 1000 DPI",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/ricardo3m/Jellyfin_PDF_plugin/releases/download/v1.0.4.0/jellyfin-plugin-pdf_1.0.4.0.zip",
+                "checksum": "9f8439dc33a5eb8d2ddc0757b84344d4",
+                "timestamp": "2026-07-10T20:19:29Z"
+            },
+            {
                 "version": "1.0.3.0",
                 "changelog": "Fix: avoid blocking Jellyfin's thread pool during PDF rendering\n- GetImageResponse now offloads synchronous PDF rendering (PDFtoImage/SkiaSharp) to Task.Run so ASP.NET thread pool threads are never blocked\n- EnsureThumbnailExistsAsync is now properly async (was fake-async, blocking caller thread)\n- PDF rendering now respects CancellationToken; requests cancelled by Jellyfin abort early\n- Fix: pageStream MemoryStream is now properly disposed after use",
                 "targetAbi": "10.11.0.0",
