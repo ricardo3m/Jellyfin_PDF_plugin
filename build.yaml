@@ -1,6 +1,6 @@
 name: "PDF Thumbnails"
 guid: "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c"
-version: "1.0.3.0"
+version: "1.0.4.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 overview: "Generates thumbnail images from the first page of PDF files."
@@ -13,9 +13,16 @@ owner: "ricardo3m"
 artifacts:
   - "Jellyfin.Plugin.Pdf.dll"
   - "PDFtoImage.dll"
+  - "UglyToad.PdfPig.dll"
+  - "UglyToad.PdfPig.Core.dll"
+  - "UglyToad.PdfPig.DocumentLayoutAnalysis.dll"
+  - "UglyToad.PdfPig.Fonts.dll"
+  - "UglyToad.PdfPig.Package.dll"
+  - "UglyToad.PdfPig.Tokenization.dll"
+  - "UglyToad.PdfPig.Tokens.dll"
 changelog: |-
-  - Fix: avoid blocking Jellyfin's thread pool during PDF rendering
-  - GetImageResponse now offloads synchronous PDF rendering to Task.Run
-  - EnsureThumbnailExistsAsync is now properly async (was fake-async)
-  - PDF rendering now respects CancellationToken
-  - Fix: pageStream MemoryStream is now properly disposed after use
+  - Feature: extract the embedded image directly when a PDF's first page is just a single full-page image (e.g. a scanned cover), instead of rasterizing it
+  - Pages that also contain text or other content are still rendered normally so nothing is lost
+  - Extracted images are rotated according to the page's /Rotate value to avoid upside-down covers
+  - Fix: rendered thumbnails now embed pixel-density (DPI) metadata so image viewers report the configured render resolution instead of always defaulting to 96 DPI
+  - Increase maximum configurable render resolution from 600 to 1000 DPI

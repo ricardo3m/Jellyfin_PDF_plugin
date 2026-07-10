@@ -39,6 +39,13 @@ jobs:
           zip -r "../artifacts/${ZIPNAME}" \
             Jellyfin.Plugin.Pdf.dll \
             PDFtoImage.dll \
+            UglyToad.PdfPig.dll \
+            UglyToad.PdfPig.Core.dll \
+            UglyToad.PdfPig.DocumentLayoutAnalysis.dll \
+            UglyToad.PdfPig.Fonts.dll \
+            UglyToad.PdfPig.Package.dll \
+            UglyToad.PdfPig.Tokenization.dll \
+            UglyToad.PdfPig.Tokens.dll \
             meta.json \
             thumb.png \
             runtimes/

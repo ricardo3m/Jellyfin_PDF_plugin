@@ -8,14 +8,14 @@ namespace Jellyfin.Plugin.Pdf.Configuration;
 public class PluginConfiguration : BasePluginConfiguration
 {
     private const int MinDpi = 36;
-    private const int MaxDpi = 600;
+    private const int MaxDpi = 1000;
     private const int DefaultDpi = 90;
 
     private int _renderResolutionDpi = DefaultDpi;
 
     /// <summary>
     /// Gets or sets the DPI used when rendering PDF pages as thumbnails.
-    /// Valid range: 36–600. Values outside this range are clamped.
+    /// Valid range: 36–1000. Values outside this range are clamped.
     /// </summary>
     public int RenderResolutionDpi
     {

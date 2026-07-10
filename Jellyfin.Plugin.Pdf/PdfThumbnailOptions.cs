@@ -9,7 +9,7 @@ public sealed class PdfThumbnailOptions
     public const int MinRenderResolutionDpi = 36;
 
     /// <summary>Maximum allowed render resolution in DPI.</summary>
-    public const int MaxRenderResolutionDpi = 600;
+    public const int MaxRenderResolutionDpi = 1000;
 
     /// <summary>Default render resolution in DPI.</summary>
     public const int DefaultRenderResolutionDpi = 150;
@@ -17,7 +17,7 @@ public sealed class PdfThumbnailOptions
     private int _renderResolutionDpi = DefaultRenderResolutionDpi;
 
     /// <summary>
-    /// Gets or sets the render resolution in DPI. Must be between 36 and 600.
+    /// Gets or sets the render resolution in DPI. Must be between 36 and 1000.
     /// </summary>
     public int RenderResolutionDpi
     {

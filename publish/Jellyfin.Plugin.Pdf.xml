@@ -26,7 +26,7 @@
         <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.RenderResolutionDpi">
             <summary>
             Gets or sets the DPI used when rendering PDF pages as thumbnails.
-            Valid range: 36–600. Values outside this range are clamped.
+            Valid range: 36–1000. Values outside this range are clamped.
             </summary>
         </member>
         <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.ThumbnailPaddingMode">
@@ -90,6 +90,47 @@
             wrapped in a fake <see cref="T:System.Net.Http.HttpResponseMessage"/> — no network call is made.
             </remarks>
         </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.BuildCover(System.Byte[],Jellyfin.Plugin.Pdf.Configuration.PaddingMode,System.Int32)">
+            <summary>
+            Decodes a source image, applies any required rotation and the configured padding mode,
+            producing the final encoded PNG cover bytes.
+            </summary>
+            <param name="sourceImageBytes">The source image bytes (PNG or JPEG).</param>
+            <param name="paddingMode">The padding mode to apply.</param>
+            <param name="rotationDegrees">Clockwise rotation (0, 90, 180 or 270) to apply first.</param>
+            <returns>The encoded PNG bytes.</returns>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.Rotate(SkiaSharp.SKBitmap,System.Int32)">
+            <summary>
+            Returns a new bitmap with <paramref name="source"/> rotated clockwise by
+            <paramref name="degrees"/> (must be 90, 180 or 270).
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PdfPageImageExtractor">
+            <summary>
+            Detects when the first page of a PDF is essentially just a single embedded image
+            (e.g. a scanned cover) and extracts that image directly, avoiding an unnecessary
+            rasterization pass through PDFium.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.FullPageCoverageThreshold">
+            <summary>Minimum fraction of the page area the image must cover to be treated as "the whole page".</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.TryExtractFirstPageImage(System.String,System.Byte[]@,System.Int32@)">
+            <summary>
+            Attempts to extract the first page's image directly, when the first page consists of
+            nothing but a single image covering (almost) the entire page. If the page has any other
+            content (text, vector graphics, multiple images, etc.) this returns false so the caller
+            falls back to full rasterization.
+            </summary>
+            <param name="pdfPath">Path to the PDF file.</param>
+            <param name="imageBytes">The extracted image bytes (PNG or JPEG), if successful.</param>
+            <param name="rotationDegrees">
+            The clockwise rotation (0, 90, 180 or 270) declared by the page that must be applied to
+            the extracted image bytes to display them in the correct orientation.
+            </param>
+            <returns>True if a full-page image was found and extracted.</returns>
+        </member>
         <member name="T:Jellyfin.Plugin.Pdf.PdfThumbnailGenerator">
             <summary>
             Generates thumbnail images from PDF files.
@@ -126,7 +167,7 @@
         </member>
         <member name="P:Jellyfin.Plugin.Pdf.PdfThumbnailOptions.RenderResolutionDpi">
             <summary>
-            Gets or sets the render resolution in DPI. Must be between 36 and 600.
+            Gets or sets the render resolution in DPI. Must be between 36 and 1000.
             </summary>
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.Plugin">
@@ -171,6 +212,29 @@
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PluginServiceRegistrar.RegisterServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,MediaBrowser.Controller.IServerApplicationHost)">
             <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PngDpiMetadata">
+            <summary>
+            Embeds physical pixel-density metadata (the <c>pHYs</c> chunk) into encoded PNG images.
+            </summary>
+            <remarks>
+            The configured render DPI controls how many pixels are rasterized per inch of the PDF
+            page, but SkiaSharp's PNG encoder does not write any pixel-density metadata into the
+            output file. Without it, image viewers and file managers fall back to an assumed
+            default (typically 96 DPI) when reporting the image's resolution, even though the pixel
+            dimensions were produced at the configured DPI. Adding the <c>pHYs</c> chunk makes the
+            file self-describe the correct density.
+            </remarks>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PngDpiMetadata.EmbedDpi(System.Byte[],System.Int32)">
+            <summary>
+            Returns a copy of <paramref name="png"/> with a <c>pHYs</c> chunk inserted (immediately
+            after the mandatory <c>IHDR</c> chunk) describing the given DPI. If <paramref name="png"/>
+            does not look like a valid PNG, it is returned unchanged.
+            </summary>
+            <param name="png">The encoded PNG bytes.</param>
+            <param name="dpi">The pixel density, in dots per inch, to embed.</param>
+            <returns>The PNG bytes with the pixel-density metadata embedded.</returns>
         </member>
     </members>
 </doc>

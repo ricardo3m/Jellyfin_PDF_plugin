@@ -7,8 +7,8 @@
     <NoWarn>CA1416;CA2255</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Jellyfin.Plugin.Pdf</RootNamespace>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +18,12 @@
     <PackageReference Include="Jellyfin.Model" Version="10.11.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+    <!--
+      Used to inspect the first page's structure (without rendering) so a page that is
+      just a single full-page embedded image can have that image extracted directly
+      instead of being rasterized. Pure managed library, no native assets.
+    -->
+    <PackageReference Include="PdfPig" Version="0.1.9" />
     <!--
       PDFtoImage 5.0.0 uses SkiaSharp >= 3.116.1, which matches Jellyfin's bundled
       SkiaSharp (assembly 3.116.0.0). Versions 5.1+ require SkiaSharp >= 3.119.0
