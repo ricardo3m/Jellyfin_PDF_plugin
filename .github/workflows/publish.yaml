@@ -39,6 +39,7 @@ jobs:
           zip -r "../artifacts/${ZIPNAME}" \
             Jellyfin.Plugin.Pdf.dll \
             PDFtoImage.dll \
+            SixLabors.ImageSharp.dll \
             UglyToad.PdfPig.dll \
             UglyToad.PdfPig.Core.dll \
             UglyToad.PdfPig.DocumentLayoutAnalysis.dll \
@@ -48,6 +49,7 @@ jobs:
             UglyToad.PdfPig.Tokens.dll \
             meta.json \
             thumb.png \
+            THIRD-PARTY-NOTICES.txt \
             runtimes/
           popd
 

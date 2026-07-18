@@ -4,6 +4,50 @@
         <name>Jellyfin.Plugin.Pdf</name>
     </assembly>
     <members>
+        <member name="T:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine">
+            <summary>
+            The engine used for the final image-encode step. Rendering and compositing always use
+            SkiaSharp; only the last encode stage differs.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine.SkiaOnly">
+            <summary>Encode with SkiaSharp only (no extra dependency).</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine.SkiaImageSharp">
+            <summary>
+            Encode with SixLabors.ImageSharp, which exposes extra WebP controls (encoding method and
+            near-lossless) that SkiaSharp does not.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling">
+            <summary>
+            The chroma subsampling ratio used when encoding JPEG output. Lower chroma resolution
+            produces smaller files; 4:4:4 keeps full color detail.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling.Subsample420">
+            <summary>4:2:0 — smallest files (chroma sampled at half resolution both axes).</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling.Subsample422">
+            <summary>4:2:2 — balanced (chroma halved horizontally only). SkiaSharp only.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling.Subsample444">
+            <summary>4:4:4 — full chroma resolution, largest files, best color fidelity.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat">
+            <summary>
+            The image format used to encode generated thumbnails.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat.Png">
+            <summary>PNG (lossless).</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat.Webp">
+            <summary>WebP (lossless or lossy).</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat.Jpeg">
+            <summary>JPEG (lossy, no transparency).</summary>
+        </member>
         <member name="T:Jellyfin.Plugin.Pdf.Configuration.PaddingMode">
             <summary>
             Controls the padding added around the rendered PDF page to produce a square thumbnail.
@@ -29,9 +73,80 @@
             Valid range: 36–1000. Values outside this range are clamped.
             </summary>
         </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.MaxImageDimension">
+            <summary>
+            Gets or sets the maximum size, in pixels, of the longest side of the generated image.
+            A value of 0 means no limit (the resolution is determined solely by the render DPI).
+            Any positive value is clamped to the 200–20000 range. The limit only ever reduces the
+            image; it never enlarges it.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.OutputFormat">
+            <summary>
+            Gets or sets the output image format used to encode the generated thumbnail.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.WebpLossless">
+            <summary>
+            Gets or sets a value indicating whether WebP output uses lossless compression.
+            Only relevant when <see cref="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.OutputFormat"/> is <see cref="F:Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat.Webp"/>.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.ImageQuality">
+            <summary>
+            Gets or sets the quality (1–100) used for lossy encoding (WebP lossy and JPEG).
+            Values outside this range are clamped.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.LosslessEffort">
+            <summary>
+            Gets or sets the lossless compression effort (0–100) used for PNG and WebP lossless.
+            Higher values produce smaller files at the cost of more processing time, with no quality
+            loss. Values outside this range are clamped.
+            </summary>
+        </member>
         <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.ThumbnailPaddingMode">
             <summary>
             Gets or sets the padding mode applied when squaring the thumbnail.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.Engine">
+            <summary>
+            Gets or sets the engine used for the final image-encode step. Rendering and compositing
+            always use SkiaSharp; only the encode stage differs. <see cref="F:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine.SkiaOnly"/>
+            is the default and keeps the existing behaviour with no extra dependency.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.WebpMethod">
+            <summary>
+            Gets or sets the WebP encoding method (0–6). Higher values give better compression at the
+            cost of speed, with no additional quality loss. Only used by the
+            <see cref="F:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine.SkiaImageSharp"/> engine for WebP output. Values outside the
+            range are clamped.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.WebpNearLossless">
+            <summary>
+            Gets or sets a value indicating whether WebP lossless output uses near-lossless
+            pre-processing, which compresses further with minimal, usually invisible, quality loss.
+            Only used by the <see cref="F:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine.SkiaImageSharp"/> engine for WebP lossless
+            output.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.JpegSubsampling">
+            <summary>
+            Gets or sets the chroma subsampling ratio used for JPEG output. Only relevant when
+            <see cref="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.OutputFormat"/> is <see cref="F:Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat.Jpeg"/>. Note that 4:2:2 is
+            only supported by the <see cref="F:Jellyfin.Plugin.Pdf.Configuration.EncoderEngine.SkiaOnly"/> engine; the ImageSharp engine
+            falls back to 4:2:0 for that setting.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.Pdf.Configuration.PluginConfiguration.ImageSharpVersion">
+            <summary>
+            Gets the version of the bundled SixLabors.ImageSharp encode library that is actually
+            loaded at runtime. This is read-only and informational only: it is surfaced on the
+            configuration page so the active ImageSharp version is visible. Because it has no setter
+            it is neither persisted to disk nor overwritten when the configuration is saved.
             </summary>
         </member>
         <member name="T:Jellyfin.Plugin.Pdf.NativeLibraryLoader">
@@ -90,7 +205,7 @@
             wrapped in a fake <see cref="T:System.Net.Http.HttpResponseMessage"/> — no network call is made.
             </remarks>
         </member>
-        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.BuildCover(System.Byte[],Jellyfin.Plugin.Pdf.Configuration.PaddingMode,System.Int32)">
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.BuildCover(System.Byte[],Jellyfin.Plugin.Pdf.Configuration.PaddingMode,System.Int32,System.Double,System.Int32,Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings,Microsoft.Extensions.Logging.ILogger)">
             <summary>
             Decodes a source image, applies any required rotation and the configured padding mode,
             producing the final encoded PNG cover bytes.
@@ -98,7 +213,108 @@
             <param name="sourceImageBytes">The source image bytes (PNG or JPEG).</param>
             <param name="paddingMode">The padding mode to apply.</param>
             <param name="rotationDegrees">Clockwise rotation (0, 90, 180 or 270) to apply first.</param>
-            <returns>The encoded PNG bytes.</returns>
+            <param name="displayedAspectRatio">
+            The width-to-height ratio the page displays the image at. When greater than zero and it
+            differs from the decoded image's native pixel aspect ratio, the image is stretched to
+            match, reproducing how a PDF viewer paints the image into the page rectangle. This avoids
+            a vertically (or horizontally) squashed cover when the embedded image's stored pixels have
+            a different aspect ratio than the page.
+            </param>
+            <param name="maxImageDimension">
+            The maximum allowed size (in pixels) of the page's longest side. Zero means no limit. The
+            limit only ever reduces the working size; it never enlarges the image.
+            </param>
+            <param name="settings">The output format and quality/effort settings used to encode.</param>
+            <param name="logger">Optional logger for diagnostics.</param>
+            <returns>The encoded image bytes.</returns>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.IsPixelAllocationFailure(System.Exception)">
+            <summary>
+            Returns <c>true</c> when <paramref name="ex"/> represents a failure to allocate the pixel
+            buffer for a bitmap (out of memory), which is recoverable by using a smaller working size.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetLongestSide(System.Byte[])">
+            <summary>
+            Reads only the header of <paramref name="imageBytes"/> to return the longest pixel
+            dimension of the encoded image, without allocating its full pixel buffer. Returns 0 when
+            the dimensions cannot be determined.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.BuildCoverCore(System.Byte[],Jellyfin.Plugin.Pdf.Configuration.PaddingMode,System.Int32,System.Double,System.Int32,Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Builds the cover image. When <paramref name="maxWorkingSide"/> is greater than zero, the
+            page is scaled so neither dimension exceeds it before compositing; zero means full
+            resolution (no reduction).
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeBitmap(SkiaSharp.SKBitmap,Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Encodes <paramref name="bitmap"/> using the format and quality/effort in
+            <paramref name="settings"/>. JPEG has no alpha channel, so an image with transparency is
+            first flattened onto a white background to avoid a black fill. The final encode step is
+            dispatched to either SkiaSharp or ImageSharp according to <see cref="P:Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings.Engine"/>.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeWithSkia(SkiaSharp.SKBitmap,Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings)">
+            <summary>
+            Encodes <paramref name="target"/> with SkiaSharp using the format-specific encoder options.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.TryEncodeWithImageSharp(SkiaSharp.SKBitmap,Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings,System.Byte[]@,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Attempts to encode <paramref name="target"/> with ImageSharp, which exposes WebP controls
+            (encoding method and near-lossless) that SkiaSharp lacks. Returns <c>false</c> (without
+            throwing) if the pixel bridge or encode fails, so the caller can fall back to SkiaSharp.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.ToImageSharpImage(SkiaSharp.SKBitmap)">
+            <summary>
+            Bridges an <see cref="T:SkiaSharp.SKBitmap"/> to an ImageSharp <see cref="T:SixLabors.ImageSharp.Image`1"/>, reading the
+            pixels as straight (unpremultiplied) RGBA so channel order and alpha match ImageSharp's
+            <see cref="T:SixLabors.ImageSharp.PixelFormats.Rgba32"/> layout and avoid color fringing on transparent edges.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.MapSkiaDownsample(Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling)">
+            <summary>
+            Maps the configured JPEG subsampling to the SkiaSharp downsample option.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.MapImageSharpJpegColor(Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling)">
+            <summary>
+            Maps the configured JPEG subsampling to the ImageSharp color type. ImageSharp's JPEG
+            encoder does not support 4:2:2, so that setting falls back to 4:2:0.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.GetContentType(Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat)">
+            <summary>
+            Returns the MIME content type for the given output <paramref name="format"/>.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings">
+            <summary>
+            The output format and quality/effort settings used to encode the final cover image.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.EncodeSettings.#ctor(Jellyfin.Plugin.Pdf.Configuration.OutputImageFormat,System.Boolean,System.Int32,System.Int32,Jellyfin.Plugin.Pdf.Configuration.EncoderEngine,System.Int32,System.Boolean,Jellyfin.Plugin.Pdf.Configuration.JpegChromaSubsampling)">
+            <summary>
+            The output format and quality/effort settings used to encode the final cover image.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.Downscale(SkiaSharp.SKBitmap,System.Int32,SkiaSharp.SKSamplingOptions)">
+            <summary>
+            Returns a copy of <paramref name="source"/> scaled down so that neither dimension exceeds
+            <paramref name="maxSide"/> (preserving aspect ratio), or <c>null</c> when it already fits.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.ReshapeToAspect(SkiaSharp.SKBitmap,System.Double)">
+            <summary>
+            Returns a new bitmap resized so its pixel aspect ratio matches
+            <paramref name="targetAspectRatio"/> (width / height), or <c>null</c> when no reshaping is
+            needed. To preserve all of the source's detail, the proportionally-too-small dimension is
+            enlarged (matching how a PDF viewer stretches the image into the page rectangle) rather
+            than discarding pixels from the other dimension.
+            </summary>
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PdfImageProvider.Rotate(SkiaSharp.SKBitmap,System.Int32)">
             <summary>
@@ -116,7 +332,7 @@
         <member name="F:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.FullPageCoverageThreshold">
             <summary>Minimum fraction of the page area the image must cover to be treated as "the whole page".</summary>
         </member>
-        <member name="M:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.TryExtractFirstPageImage(System.String,System.Byte[]@,System.Int32@)">
+        <member name="M:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.TryExtractFirstPageImage(System.String,System.Byte[]@,System.Int32@,System.Double@)">
             <summary>
             Attempts to extract the first page's image directly, when the first page consists of
             nothing but a single image covering (almost) the entire page. If the page has any other
@@ -128,6 +344,12 @@
             <param name="rotationDegrees">
             The clockwise rotation (0, 90, 180 or 270) declared by the page that must be applied to
             the extracted image bytes to display them in the correct orientation.
+            </param>
+            <param name="displayedAspectRatio">
+            The width-to-height ratio the page displays the image at (after any page rotation). The
+            embedded image's raw pixels may be stored at a different aspect ratio and are stretched by
+            a PDF viewer to fill the page rectangle; the caller must reproduce that stretch to avoid a
+            squashed result.
             </param>
             <returns>True if a full-page image was found and extracted.</returns>
         </member>

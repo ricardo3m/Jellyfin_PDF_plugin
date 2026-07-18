@@ -1,4 +1,5 @@
 using PDFtoImage;
+using SkiaSharp;
 
 namespace Jellyfin.Plugin.Pdf;
 
@@ -58,7 +59,9 @@ public sealed class PdfThumbnailGenerator
 
         var extension = Path.GetExtension(thumbnailPath);
         var usePng = extension.Equals(".png", StringComparison.OrdinalIgnoreCase);
-        var renderOptions = new RenderOptions(Dpi: _options.RenderResolutionDpi);
+        // Explicit white background so PDFs without a background fill don't render
+        // as transparent (which shows as grey in dark-themed clients).
+        var renderOptions = new RenderOptions(Dpi: _options.RenderResolutionDpi, BackgroundColor: SKColors.White);
 
         await Task.Run(() =>
         {

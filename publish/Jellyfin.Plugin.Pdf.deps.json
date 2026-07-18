@@ -6,12 +6,18 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "Jellyfin.Plugin.Pdf/1.0.1.0": {
+      "Jellyfin.Plugin.Pdf/1.0.0": {
         "dependencies": {
           "Jellyfin.Controller": "10.11.11",
           "Jellyfin.Model": "10.11.11",
           "PDFtoImage": "5.0.0",
-          "SkiaSharp": "3.116.1"
+          "PdfPig": "0.1.9",
+          "SixLabors.ImageSharp": "2.1.11",
+          "SkiaSharp": "3.116.1",
+          "SkiaSharp.NativeAssets.Linux.NoDependencies": "3.116.1",
+          "SkiaSharp.NativeAssets.WebAssembly": "3.116.1",
+          "SkiaSharp.NativeAssets.Win32": "3.116.1",
+          "SkiaSharp.NativeAssets.macOS": "3.116.1"
         },
         "runtime": {
           "Jellyfin.Plugin.Pdf.dll": {}
@@ -228,9 +234,41 @@
         }
       },
       "Microsoft.Extensions.Primitives/9.0.11": {},
-      "Microsoft.NETCore.Platforms/1.1.0": {},
+      "Microsoft.NETCore.Platforms/5.0.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
       "NEbml/1.1.0.5": {},
+      "PdfPig/0.1.9": {
+        "runtime": {
+          "lib/net8.0/UglyToad.PdfPig.Core.dll": {
+            "assemblyVersion": "0.1.9.0",
+            "fileVersion": "0.1.9.0"
+          },
+          "lib/net8.0/UglyToad.PdfPig.DocumentLayoutAnalysis.dll": {
+            "assemblyVersion": "0.1.9.0",
+            "fileVersion": "0.1.9.0"
+          },
+          "lib/net8.0/UglyToad.PdfPig.Fonts.dll": {
+            "assemblyVersion": "0.1.9.0",
+            "fileVersion": "0.1.9.0"
+          },
+          "lib/net8.0/UglyToad.PdfPig.Package.dll": {
+            "assemblyVersion": "0.1.8.0",
+            "fileVersion": "0.1.8.0"
+          },
+          "lib/net8.0/UglyToad.PdfPig.Tokenization.dll": {
+            "assemblyVersion": "0.1.9.0",
+            "fileVersion": "0.1.9.0"
+          },
+          "lib/net8.0/UglyToad.PdfPig.Tokens.dll": {
+            "assemblyVersion": "0.1.9.0",
+            "fileVersion": "0.1.9.0"
+          },
+          "lib/net8.0/UglyToad.PdfPig.dll": {
+            "assemblyVersion": "0.1.9.0",
+            "fileVersion": "0.1.9.0"
+          }
+        }
+      },
       "PDFtoImage/5.0.0": {
         "dependencies": {
           "SkiaSharp": "3.116.1",
@@ -256,77 +294,46 @@
         }
       },
       "Polly.Core/8.6.5": {},
+      "SixLabors.ImageSharp/2.1.11": {
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "5.0.0",
+          "System.Text.Encoding.CodePages": "5.0.0"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/SixLabors.ImageSharp.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.1.11.0"
+          }
+        }
+      },
       "SkiaSharp/3.116.1": {
         "dependencies": {
           "SkiaSharp.NativeAssets.Win32": "3.116.1",
           "SkiaSharp.NativeAssets.macOS": "3.116.1"
         }
       },
-      "SkiaSharp.NativeAssets.Linux.NoDependencies/3.116.1": {
-        "runtimeTargets": {
-          "runtimes/linux-arm/native/libSkiaSharp.so": {
-            "rid": "linux-arm",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/linux-arm64/native/libSkiaSharp.so": {
-            "rid": "linux-arm64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/linux-musl-x64/native/libSkiaSharp.so": {
-            "rid": "linux-musl-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/linux-x64/native/libSkiaSharp.so": {
-            "rid": "linux-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "SkiaSharp.NativeAssets.macOS/3.116.1": {
-        "runtimeTargets": {
-          "runtimes/osx/native/libSkiaSharp.dylib": {
-            "rid": "osx",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
+      "SkiaSharp.NativeAssets.Linux.NoDependencies/3.116.1": {},
+      "SkiaSharp.NativeAssets.macOS/3.116.1": {},
       "SkiaSharp.NativeAssets.WebAssembly/3.116.1": {},
-      "SkiaSharp.NativeAssets.Win32/3.116.1": {
-        "runtimeTargets": {
-          "runtimes/win-arm64/native/libSkiaSharp.dll": {
-            "rid": "win-arm64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/win-x64/native/libSkiaSharp.dll": {
-            "rid": "win-x64",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          },
-          "runtimes/win-x86/native/libSkiaSharp.dll": {
-            "rid": "win-x86",
-            "assetType": "native",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
+      "SkiaSharp.NativeAssets.Win32/3.116.1": {},
       "Sungaila.PDFium.BlazorWebAssembly/133.0.6872": {},
       "System.Globalization/4.3.0": {
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "5.0.0",
           "Microsoft.NETCore.Targets": "1.1.0",
           "System.Runtime": "4.3.0"
         }
       },
       "System.Runtime/4.3.0": {
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "5.0.0",
           "Microsoft.NETCore.Targets": "1.1.0"
+        }
+      },
+      "System.Runtime.CompilerServices.Unsafe/5.0.0": {},
+      "System.Text.Encoding.CodePages/5.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "5.0.0"
         }
       },
       "System.Text.Json/9.0.11": {},
@@ -334,7 +341,7 @@
     }
   },
   "libraries": {
-    "Jellyfin.Plugin.Pdf/1.0.1.0": {
+    "Jellyfin.Plugin.Pdf/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -549,12 +556,12 @@
       "path": "microsoft.extensions.primitives/9.0.11",
       "hashPath": "microsoft.extensions.primitives.9.0.11.nupkg.sha512"
     },
-    "Microsoft.NETCore.Platforms/1.1.0": {
+    "Microsoft.NETCore.Platforms/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A==",
-      "path": "microsoft.netcore.platforms/1.1.0",
-      "hashPath": "microsoft.netcore.platforms.1.1.0.nupkg.sha512"
+      "sha512": "sha512-VyPlqzH2wavqquTcYpkIIAQ6WdenuKoFN0BdYBbCWsclXacSOHNQn66Gt4z5NBqEYW0FAPm5rlvki9ZiCij5xQ==",
+      "path": "microsoft.netcore.platforms/5.0.0",
+      "hashPath": "microsoft.netcore.platforms.5.0.0.nupkg.sha512"
     },
     "Microsoft.NETCore.Targets/1.1.0": {
       "type": "package",
@@ -569,6 +576,13 @@
       "sha512": "sha512-svtqDc+hue9kbnqNN2KkK4om/hDrc7K127cNb5FIYfgKgzo+JNDPXNLp8NioCchHhBO3lxWd4Cp/iiZZ3aoUqg==",
       "path": "nebml/1.1.0.5",
       "hashPath": "nebml.1.1.0.5.nupkg.sha512"
+    },
+    "PdfPig/0.1.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VU27oq5O0rpD+zWiD639xXkSHtsNXqbPpYV0pzYg9VPhDibH1cq1i67f9DuW2WnzDVEti0HipLcZxDhdayIzGg==",
+      "path": "pdfpig/0.1.9",
+      "hashPath": "pdfpig.0.1.9.nupkg.sha512"
     },
     "PDFtoImage/5.0.0": {
       "type": "package",
@@ -590,6 +604,13 @@
       "sha512": "sha512-t+sUVrIwvo7UmsgHGgOG9F0GDZSRIm47u2ylH17Gvcv1q5hNEwgD5GoBlFyc0kh/pebmPyrAgvGsR/65ZBaXlg==",
       "path": "polly.core/8.6.5",
       "hashPath": "polly.core.8.6.5.nupkg.sha512"
+    },
+    "SixLabors.ImageSharp/2.1.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tUvsejgzUmEbES114yLseRxmFiYlQbH5RyaYXUQsEL7ksDo1/kW+ZL1EfD6iSUfxj7LHU8p110oFvSrRfsaWSQ==",
+      "path": "sixlabors.imagesharp/2.1.11",
+      "hashPath": "sixlabors.imagesharp.2.1.11.nupkg.sha512"
     },
     "SkiaSharp/3.116.1": {
       "type": "package",
@@ -646,6 +667,20 @@
       "sha512": "sha512-JufQi0vPQ0xGnAczR13AUFglDyVYt4Kqnz1AZaiKZ5+GICq0/1MH/mO/eAJHt/mHW1zjKBJd7kV26SrxddAhiw==",
       "path": "system.runtime/4.3.0",
       "hashPath": "system.runtime.4.3.0.nupkg.sha512"
+    },
+    "System.Runtime.CompilerServices.Unsafe/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZD9TMpsmYJLrxbbmdvhwt9YEgG5WntEnZ/d1eH8JBX9LBp+Ju8BSBhUGbZMNVHHomWo2KVImJhTDl2hIgw/6MA==",
+      "path": "system.runtime.compilerservices.unsafe/5.0.0",
+      "hashPath": "system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+    },
+    "System.Text.Encoding.CodePages/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NyscU59xX6Uo91qvhOs2Ccho3AR2TnZPomo1Z0K6YpyztBPM/A5VbkzOO19sy3A3i1TtEnTxA7bCe3Us+r5MWg==",
+      "path": "system.text.encoding.codepages/5.0.0",
+      "hashPath": "system.text.encoding.codepages.5.0.0.nupkg.sha512"
     },
     "System.Text.Json/9.0.11": {
       "type": "package",

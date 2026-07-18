@@ -7,8 +7,8 @@
     <NoWarn>CA1416;CA2255</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Jellyfin.Plugin.Pdf</RootNamespace>
-    <AssemblyVersion>1.0.4.0</AssemblyVersion>
-    <FileVersion>1.0.4.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,6 +53,14 @@
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" ExcludeAssets="all" />
     <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="3.116.1" ExcludeAssets="all" />
     <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.116.1" ExcludeAssets="all" />
+    <!--
+      Optional second encode engine (selectable in the plugin config). ImageSharp exposes WebP
+      controls that SkiaSharp does not (encoding method 0–6, near-lossless). Version pinned to
+      exactly 2.1.11 because 2.1.x is Apache-2.0; 3.x switched to the Six Labors Split License,
+      which restricts commercial use and is incompatible with this plugin's licensing. ImageSharp
+      is pure managed (no native assets), so it does not conflict with Jellyfin's SkiaSharp.
+    -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="[2.1.11]" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,6 +71,12 @@
   <ItemGroup>
     <None Include="meta.json" CopyToOutputDirectory="Always" />
     <None Include="thumb.png" CopyToOutputDirectory="Always" Condition="Exists('thumb.png')" />
+    <!--
+      Attribution for redistributed third-party binaries (currently SixLabors.ImageSharp,
+      Apache-2.0). Apache-2.0 requires the license to travel with the redistributed DLL,
+      so ship it next to the plugin assembly in every build/publish output.
+    -->
+    <None Include="..\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <!--

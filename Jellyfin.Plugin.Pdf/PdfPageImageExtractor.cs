@@ -25,11 +25,18 @@ internal static class PdfPageImageExtractor
     /// The clockwise rotation (0, 90, 180 or 270) declared by the page that must be applied to
     /// the extracted image bytes to display them in the correct orientation.
     /// </param>
+    /// <param name="displayedAspectRatio">
+    /// The width-to-height ratio the page displays the image at (after any page rotation). The
+    /// embedded image's raw pixels may be stored at a different aspect ratio and are stretched by
+    /// a PDF viewer to fill the page rectangle; the caller must reproduce that stretch to avoid a
+    /// squashed result.
+    /// </param>
     /// <returns>True if a full-page image was found and extracted.</returns>
-    public static bool TryExtractFirstPageImage(string pdfPath, out byte[]? imageBytes, out int rotationDegrees)
+    public static bool TryExtractFirstPageImage(string pdfPath, out byte[]? imageBytes, out int rotationDegrees, out double displayedAspectRatio)
     {
         imageBytes = null;
         rotationDegrees = 0;
+        displayedAspectRatio = 0;
 
         try
         {
@@ -99,6 +106,16 @@ internal static class PdfPageImageExtractor
             // The raw image bytes don't carry the page's /Rotate entry, so the caller must
             // rotate them (clockwise) to match how a PDF viewer would display the page.
             rotationDegrees = ((page.Rotation.Value % 360) + 360) % 360;
+
+            // The rectangle the image is painted into (in page space). A 90/270 page rotation
+            // swaps width and height as seen by the viewer.
+            var placedWidth = (double)image.Bounds.Width;
+            var placedHeight = (double)image.Bounds.Height;
+            displayedAspectRatio = placedHeight <= 0
+                ? 0
+                : (rotationDegrees == 90 || rotationDegrees == 270)
+                    ? placedHeight / placedWidth
+                    : placedWidth / placedHeight;
             return true;
         }
         catch

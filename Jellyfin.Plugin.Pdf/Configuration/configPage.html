@@ -41,6 +41,150 @@
                                     no padding keeps the original page proportions.
                                 </div>
                             </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel" for="EncoderEngine">
+                                    Encoder Engine
+                                </label>
+                                <select id="EncoderEngine" name="EncoderEngine"
+                                        is="emby-select" class="emby-select-withcolor emby-select">
+                                    <option value="SkiaOnly">Skia only</option>
+                                    <option value="SkiaImageSharp">Skia + ImageSharp</option>
+                                </select>
+                                <div class="fieldDescription">
+                                    "Skia only" uses Jellyfin's built-in encoder (no extra dependency).
+                                    "Skia + ImageSharp" adds WebP encoding method and near-lossless controls.
+                                    Rendering always uses Skia; only the final encode step changes.
+                                    <span id="ImageSharpVersionNote"></span>
+                                </div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel" for="OutputFormat">
+                                    Output Format
+                                </label>
+                                <select id="OutputFormat" name="OutputFormat"
+                                        is="emby-select" class="emby-select-withcolor emby-select">
+                                    <option value="Png">PNG (lossless)</option>
+                                    <option value="Webp">WebP (lossless or lossy)</option>
+                                    <option value="Jpeg">JPEG (lossy, no transparency)</option>
+                                </select>
+                                <div class="fieldDescription" id="OutputFormatDescription">
+                                    The image format used to encode the generated cover.
+                                    PNG and WebP support transparency; JPEG does not.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="WebpCompressionContainer" style="display:none;">
+                                <label class="inputLabel" for="WebpCompression">
+                                    WebP Compression
+                                </label>
+                                <select id="WebpCompression" name="WebpCompression"
+                                        is="emby-select" class="emby-select-withcolor emby-select">
+                                    <option value="Lossless">Lossless</option>
+                                    <option value="Lossy">Lossy</option>
+                                </select>
+                                <div class="fieldDescription">
+                                    Lossless keeps every pixel (typically ~20–30% smaller than PNG);
+                                    lossy trades quality for much smaller files.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="WebpMethodContainer" style="display:none;">
+                                <label class="inputLabel" for="WebpMethod">
+                                    WebP Method
+                                </label>
+                                <input id="WebpMethod" name="WebpMethod"
+                                       type="number" is="emby-input"
+                                       min="0" max="6" step="1" placeholder="4" />
+                                <div class="fieldDescription">
+                                    Compression method (0–6). Higher values produce smaller files,
+                                    more slowly, with no extra quality loss.
+                                    Only available with the "Skia + ImageSharp" engine. Default: 4.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="LosslessEffortContainer" style="display:none;">
+                                <label class="inputLabel" for="LosslessEffort">
+                                    Compression Effort
+                                </label>
+                                <input id="LosslessEffort" name="LosslessEffort"
+                                       type="number" is="emby-input"
+                                       min="0" max="100" step="1" placeholder="100" />
+                                <div class="fieldDescription">
+                                    Effort for lossless encoding (PNG / WebP lossless).
+                                    Higher values produce smaller files, more slowly, with no quality loss.
+                                    Valid range: 0–100. Default: 100.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="WebpNearLosslessContainer" style="display:none;">
+                                <label class="checkboxContainer">
+                                    <input id="WebpNearLossless" name="WebpNearLossless"
+                                           type="checkbox" is="emby-checkbox" />
+                                    <span>WebP near-lossless</span>
+                                </label>
+                                <div class="fieldDescription">
+                                    Pre-processes the image to compress further with minimal, usually
+                                    invisible, quality loss. Only available with the "Skia + ImageSharp"
+                                    engine for lossless WebP.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="ImageQualityContainer" style="display:none;">
+                                <label class="inputLabel" for="ImageQuality">
+                                    Quality
+                                </label>
+                                <input id="ImageQuality" name="ImageQuality"
+                                       type="number" is="emby-input"
+                                       min="1" max="100" step="1" placeholder="90" />
+                                <div class="fieldDescription">
+                                    Visual quality for lossy encoding (WebP lossy / JPEG).
+                                    Lower values produce smaller files with more visible artifacts.
+                                    Valid range: 1–100. Default: 90.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="JpegSubsamplingContainer" style="display:none;">
+                                <label class="inputLabel" for="JpegSubsampling">
+                                    JPEG Chroma Subsampling
+                                </label>
+                                <select id="JpegSubsampling" name="JpegSubsampling"
+                                        is="emby-select" class="emby-select-withcolor emby-select">
+                                    <option value="Subsample420">4:2:0 — smallest files</option>
+                                    <option value="Subsample422">4:2:2 — balanced (Skia only)</option>
+                                    <option value="Subsample444">4:4:4 — best color detail</option>
+                                </select>
+                                <div class="fieldDescription">
+                                    Trades JPEG color detail for file size. 4:2:0 is smallest;
+                                    4:4:4 keeps full color resolution. 4:2:2 is only supported by the
+                                    "Skia only" engine (the ImageSharp engine falls back to 4:2:0).
+                                </div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel" for="MaxImageResolutionPreset">
+                                    Maximum Resolution
+                                </label>
+                                <select id="MaxImageResolutionPreset" name="MaxImageResolutionPreset"
+                                        is="emby-select" class="emby-select-withcolor emby-select">
+                                    <option value="0">No limit</option>
+                                    <option value="1000">1000 px</option>
+                                    <option value="1500">1500 px</option>
+                                    <option value="2000">2000 px</option>
+                                    <option value="2560">2560 px</option>
+                                    <option value="4000">4000 px</option>
+                                    <option value="custom">Custom…</option>
+                                </select>
+                                <div class="fieldDescription">
+                                    Caps the longest side (in pixels) of the generated image.
+                                    The limit only ever reduces the image, never enlarges it.
+                                    "No limit" keeps the resolution defined by the render DPI.
+                                </div>
+                            </div>
+                            <div class="inputContainer" id="MaxImageDimensionCustomContainer" style="display:none;">
+                                <label class="inputLabel" for="MaxImageDimensionCustom">
+                                    Custom Resolution (px)
+                                </label>
+                                <input id="MaxImageDimensionCustom" name="MaxImageDimensionCustom"
+                                       type="number" is="emby-input"
+                                       min="200" max="20000" step="1" placeholder="2000" />
+                                <div class="fieldDescription">
+                                    Enter a custom maximum for the longest side.
+                                    Valid range: 200–20000 px.
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -65,14 +209,147 @@
                 return (value != null) ? value : 'Transparent';
             }
 
+            var ResolutionPresets = ['0', '1000', '1500', '2000', '2560', '4000'];
+
+            function updateCustomVisibility(page) {
+                var isCustom = page.querySelector('#MaxImageResolutionPreset').value === 'custom';
+                page.querySelector('#MaxImageDimensionCustomContainer').style.display = isCustom ? '' : 'none';
+            }
+
+            function normalizeFormat(value) {
+                var names = ['Png', 'Webp', 'Jpeg'];
+                if (typeof value === 'number') {
+                    return names[value] || 'Png';
+                }
+                return (value != null) ? value : 'Png';
+            }
+
+            var EngineNames = ['SkiaOnly', 'SkiaImageSharp'];
+
+            function normalizeEngine(value) {
+                if (typeof value === 'number') {
+                    return EngineNames[value] || 'SkiaOnly';
+                }
+                return (value != null) ? value : 'SkiaOnly';
+            }
+
+            var SubsamplingNames = ['Subsample420', 'Subsample422', 'Subsample444'];
+
+            function normalizeSubsampling(value) {
+                if (typeof value === 'number') {
+                    return SubsamplingNames[value] || 'Subsample420';
+                }
+                return (value != null) ? value : 'Subsample420';
+            }
+
+            function updateFormatVisibility(page) {
+                var format = page.querySelector('#OutputFormat').value;
+                var engine = page.querySelector('#EncoderEngine').value;
+                var isWebp = format === 'Webp';
+                var isJpeg = format === 'Jpeg';
+                var isImageSharp = engine === 'SkiaImageSharp';
+                var webpLossless = page.querySelector('#WebpCompression').value === 'Lossless';
+
+                // WebP compression mode only applies to WebP.
+                page.querySelector('#WebpCompressionContainer').style.display = isWebp ? '' : 'none';
+
+                // WebP encoding method is an ImageSharp-only control for WebP output.
+                page.querySelector('#WebpMethodContainer').style.display = (isImageSharp && isWebp) ? '' : 'none';
+
+                // Lossless effort applies to PNG and WebP-lossless.
+                var showEffort = format === 'Png' || (isWebp && webpLossless);
+                page.querySelector('#LosslessEffortContainer').style.display = showEffort ? '' : 'none';
+
+                // Near-lossless is an ImageSharp-only control for WebP-lossless output.
+                page.querySelector('#WebpNearLosslessContainer').style.display =
+                    (isImageSharp && isWebp && webpLossless) ? '' : 'none';
+
+                // Quality applies to WebP-lossy and JPEG.
+                var showQuality = (isWebp && !webpLossless) || isJpeg;
+                page.querySelector('#ImageQualityContainer').style.display = showQuality ? '' : 'none';
+
+                // Chroma subsampling only applies to JPEG.
+                page.querySelector('#JpegSubsamplingContainer').style.display = isJpeg ? '' : 'none';
+
+                // JPEG has no alpha: disable the transparent padding option.
+                var paddingSelect = page.querySelector('#ThumbnailPaddingMode');
+                var transparentOption = paddingSelect.querySelector('option[value="Transparent"]');
+                if (transparentOption) {
+                    transparentOption.disabled = isJpeg;
+                }
+                if (isJpeg && paddingSelect.value === 'Transparent') {
+                    paddingSelect.value = 'White';
+                }
+            }
+
+            function applyResolution(page, value) {
+                var dimension = parseInt(value) || 0;
+                var presetSelect = page.querySelector('#MaxImageResolutionPreset');
+                var customInput = page.querySelector('#MaxImageDimensionCustom');
+                if (ResolutionPresets.indexOf(String(dimension)) >= 0) {
+                    presetSelect.value = String(dimension);
+                    customInput.value = '';
+                } else {
+                    presetSelect.value = 'custom';
+                    customInput.value = dimension;
+                }
+                updateCustomVisibility(page);
+            }
+
+            function readResolution(page) {
+                var preset = page.querySelector('#MaxImageResolutionPreset').value;
+                if (preset === 'custom') {
+                    var custom = parseInt(page.querySelector('#MaxImageDimensionCustom').value) || 0;
+                    if (custom <= 0) {
+                        return 0;
+                    }
+                    return Math.min(20000, Math.max(200, custom));
+                }
+                return parseInt(preset) || 0;
+            }
+
+            $(document).on('change', '#MaxImageResolutionPreset', function () {
+                updateCustomVisibility(document.querySelector('#PdfThumbnailsConfigPage'));
+            });
+
+            $(document).on('change', '#OutputFormat, #WebpCompression, #EncoderEngine', function () {
+                updateFormatVisibility(document.querySelector('#PdfThumbnailsConfigPage'));
+            });
+
             $('.pluginConfigurationPage').on('pageshow', function () {
                 var page = this;
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                     var dpi = (config.RenderResolutionDpi != null) ? config.RenderResolutionDpi : config.renderResolutionDpi;
                     var padding = (config.ThumbnailPaddingMode != null) ? config.ThumbnailPaddingMode : config.thumbnailPaddingMode;
+                    var maxDim = (config.MaxImageDimension != null) ? config.MaxImageDimension : config.maxImageDimension;
+                    var format = (config.OutputFormat != null) ? config.OutputFormat : config.outputFormat;
+                    var webpLossless = (config.WebpLossless != null) ? config.WebpLossless : config.webpLossless;
+                    var quality = (config.ImageQuality != null) ? config.ImageQuality : config.imageQuality;
+                    var effort = (config.LosslessEffort != null) ? config.LosslessEffort : config.losslessEffort;
+                    var engine = (config.Engine != null) ? config.Engine : config.engine;
+                    var webpMethod = (config.WebpMethod != null) ? config.WebpMethod : config.webpMethod;
+                    var nearLossless = (config.WebpNearLossless != null) ? config.WebpNearLossless : config.webpNearLossless;
+                    var subsampling = (config.JpegSubsampling != null) ? config.JpegSubsampling : config.jpegSubsampling;
                     page.querySelector('#RenderResolutionDpi').value = (dpi != null) ? dpi : 90;
                     page.querySelector('#ThumbnailPaddingMode').value = normalizePadding(padding) || 'Transparent';
+                    applyResolution(page, (maxDim != null) ? maxDim : 0);
+                    page.querySelector('#OutputFormat').value = normalizeFormat(format);
+                    page.querySelector('#EncoderEngine').value = normalizeEngine(engine);
+                    page.querySelector('#WebpCompression').value = (webpLossless === false) ? 'Lossy' : 'Lossless';
+                    page.querySelector('#ImageQuality').value = (quality != null) ? quality : 90;
+                    page.querySelector('#LosslessEffort').value = (effort != null) ? effort : 100;
+                    page.querySelector('#WebpMethod').value = (webpMethod != null) ? webpMethod : 4;
+                    page.querySelector('#WebpNearLossless').checked = (nearLossless === true);
+                    page.querySelector('#JpegSubsampling').value = normalizeSubsampling(subsampling);
+                    var versionNote = page.querySelector('#ImageSharpVersionNote');
+                    var imageSharpVersion = (config.ImageSharpVersion != null) ? config.ImageSharpVersion : config.imageSharpVersion;
+                    if (versionNote) {
+                        versionNote.textContent = (imageSharpVersion && imageSharpVersion !== 'unavailable')
+                            ? ' Bundled ImageSharp version: ' + imageSharpVersion + '.'
+                            : '';
+                    }
+                    updateFormatVisibility(page);
                     Dashboard.hideLoadingMsg();
                 });
             });
@@ -84,6 +361,25 @@
                     config.RenderResolutionDpi = parseInt(page.querySelector('#RenderResolutionDpi').value) || 90;
                     var paddingIndex = PaddingModeNames.indexOf(page.querySelector('#ThumbnailPaddingMode').value);
                     config.ThumbnailPaddingMode = (paddingIndex >= 0) ? paddingIndex : 0;
+                    config.MaxImageDimension = readResolution(page);
+                    var FormatNames = ['Png', 'Webp', 'Jpeg'];
+                    var formatIndex = FormatNames.indexOf(page.querySelector('#OutputFormat').value);
+                    config.OutputFormat = (formatIndex >= 0) ? formatIndex : 0;
+                    config.WebpLossless = page.querySelector('#WebpCompression').value === 'Lossless';
+                    config.ImageQuality = Math.min(100, Math.max(1, parseInt(page.querySelector('#ImageQuality').value) || 90));
+                    var effortValue = parseInt(page.querySelector('#LosslessEffort').value);
+                    if (isNaN(effortValue)) { effortValue = 100; }
+                    config.LosslessEffort = Math.min(100, Math.max(0, effortValue));
+                    var EngineNamesSave = ['SkiaOnly', 'SkiaImageSharp'];
+                    var engineIndex = EngineNamesSave.indexOf(page.querySelector('#EncoderEngine').value);
+                    config.Engine = (engineIndex >= 0) ? engineIndex : 0;
+                    var methodValue = parseInt(page.querySelector('#WebpMethod').value);
+                    if (isNaN(methodValue)) { methodValue = 4; }
+                    config.WebpMethod = Math.min(6, Math.max(0, methodValue));
+                    config.WebpNearLossless = page.querySelector('#WebpNearLossless').checked === true;
+                    var SubsamplingNamesSave = ['Subsample420', 'Subsample422', 'Subsample444'];
+                    var subsamplingIndex = SubsamplingNamesSave.indexOf(page.querySelector('#JpegSubsampling').value);
+                    config.JpegSubsampling = (subsamplingIndex >= 0) ? subsamplingIndex : 0;
                     ApiClient.updatePluginConfiguration(pluginId, config).then(Dashboard.processPluginConfigurationUpdateResult);
                 });
             });
