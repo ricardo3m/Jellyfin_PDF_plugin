@@ -9,6 +9,14 @@
         "imageUrl": null,
         "versions": [
             {
+                "version": "1.1.0.0",
+                "changelog": "Feature: configurable output image format (PNG, WebP or JPEG) instead of always PNG\n- Feature: optional second encode engine (\"Skia + ImageSharp\") exposing WebP encoding method (0-6) and near-lossless pre-processing not available via Skia alone\n- Feature: configurable image quality (1-100) for lossy encoding (WebP lossy / JPEG)\n- Feature: configurable lossless compression effort (0-100) for PNG and WebP lossless\n- Feature: configurable JPEG chroma subsampling (4:2:0 / 4:2:2 / 4:4:4)\n- Feature: configurable maximum thumbnail resolution (longest side cap) with presets and a custom value, independent of render DPI\n- Config page now shows only the options relevant to the selected format/engine, and displays the bundled ImageSharp version\n- JPEG output automatically disables transparent padding since JPEG has no alpha channel",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/ricardo3m/Jellyfin_PDF_plugin/releases/download/v1.1.0.0/jellyfin-plugin-pdf_1.1.0.0.zip",
+                "checksum": "effc353e6f4636fbaf81e6a3f9e56c2c",
+                "timestamp": "2026-07-18T12:16:54Z"
+            },
+            {
                 "version": "1.0.4.0",
                 "changelog": "Feature: extract the embedded image directly when a PDF's first page is just a single full-page image (e.g. a scanned cover), instead of rasterizing it\n- Pages that also contain text or other content are still rendered normally so nothing is lost\n- Extracted images are rotated according to the page's /Rotate value to avoid upside-down covers\nFix: rendered thumbnails now embed pixel-density (DPI) metadata so image viewers report the configured render resolution instead of always defaulting to 96 DPI\n- Increase maximum configurable render resolution from 600 to 1000 DPI",
                 "targetAbi": "10.11.0.0",
