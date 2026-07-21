@@ -1,6 +1,6 @@
 {
   "category": "General",
-  "changelog": "Feature: configurable output image format (PNG, WebP or JPEG) instead of always PNG\n- Feature: optional second encode engine (\"Skia + ImageSharp\") exposing WebP encoding method (0-6) and near-lossless pre-processing not available via Skia alone\n- Feature: configurable image quality (1-100) for lossy encoding (WebP lossy / JPEG)\n- Feature: configurable lossless compression effort (0-100) for PNG and WebP lossless\n- Feature: configurable JPEG chroma subsampling (4:2:0 / 4:2:2 / 4:4:4)\n- Feature: configurable maximum thumbnail resolution (longest side cap) with presets and a custom value, independent of render DPI\n- Config page now shows only the options relevant to the selected format/engine, and displays the bundled ImageSharp version\n- JPEG output automatically disables transparent padding since JPEG has no alpha channel",
+  "changelog": "Fix: embedded full-page image extraction could produce a cropped-looking cover for PDFs where the first page's image is placed relative to a MediaBox that is offset/larger than the page's own CropBox (seen in some newspaper/imposed PDF exports)\n- The full-page-image detection now compares the image's placement against the page's CropBox using intersection-over-union instead of a plain area ratio, so images that only partially overlap the visible page (or extend well beyond it as bleed) correctly fall back to full rasterization instead of being extracted as-is",
   "description": "Automatically generates cover thumbnails for PDF files in your Jellyfin library by rendering the first page of each PDF. Supports configurable render resolution (DPI) and thumbnail padding mode.",
   "guid": "a5e3a6c8-2d4b-4f3e-9c1a-7b8d6e5f4a2c",
   "imageUrl": null,
@@ -9,6 +9,6 @@
   "overview": "Generates thumbnail images from the first page of PDF files.",
   "owner": "ricardo3m",
   "targetAbi": "10.11.0.0",
-  "timestamp": "2026-07-18T00:00:00Z",
-  "version": "1.1.0.0"
+  "timestamp": "2026-07-21T00:00:00Z",
+  "version": "1.1.1.0"
 }

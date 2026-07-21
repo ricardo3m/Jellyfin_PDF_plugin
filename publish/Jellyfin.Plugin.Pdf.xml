@@ -330,7 +330,7 @@
             </summary>
         </member>
         <member name="F:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.FullPageCoverageThreshold">
-            <summary>Minimum fraction of the page area the image must cover to be treated as "the whole page".</summary>
+            <summary>Minimum intersection-over-union between the image and the page's crop box for the image to be treated as "the whole page".</summary>
         </member>
         <member name="M:Jellyfin.Plugin.Pdf.PdfPageImageExtractor.TryExtractFirstPageImage(System.String,System.Byte[]@,System.Int32@,System.Double@)">
             <summary>

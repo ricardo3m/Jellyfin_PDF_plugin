@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UglyToad.PdfPig;
 
@@ -10,7 +11,7 @@ namespace Jellyfin.Plugin.Pdf;
 /// </summary>
 internal static class PdfPageImageExtractor
 {
-    /// <summary>Minimum fraction of the page area the image must cover to be treated as "the whole page".</summary>
+    /// <summary>Minimum intersection-over-union between the image and the page's crop box for the image to be treated as "the whole page".</summary>
     private const double FullPageCoverageThreshold = 0.90;
 
     /// <summary>
@@ -64,16 +65,49 @@ internal static class PdfPageImageExtractor
             }
 
             var image = images[0];
-            var pageArea = (double)page.Width * (double)page.Height;
 
-            if (pageArea <= 0)
+            // Use the page's crop box (the actual visible rectangle a viewer clips to), not just
+            // page.Width/Height as scalars, so the image's position can be checked too. Some PDFs
+            // (e.g. imposed/paginated newspaper exports) place a full-bleed image that is
+            // considerably larger than this page's own CropBox, with a chunk of the image
+            // extending above the visible area and another chunk extending below it. A viewer
+            // (and a full rasterization pass) clips that overhang away, but a raw byte-for-byte
+            // extraction of the image would not, producing a cover with extra, incorrectly
+            // visible content and the real page content squeezed into the middle - looking
+            // "cropped" even though nothing was ever cropped during extraction.
+            //
+            // Comparing the intersection-over-union (IoU) of the image's placement rectangle and
+            // the crop box catches both cases with a single check: an image that only partly
+            // overlaps the page (a hole) and an image that engulfs the page but extends well
+            // beyond it (bleed) both pull the IoU down, while an image that closely matches the
+            // page rectangle keeps it near 1.
+            var cropBox = page.CropBox.Bounds;
+            var pageArea = cropBox.Width * cropBox.Height;
+            var imageArea = image.Bounds.Width * image.Bounds.Height;
+
+            if (pageArea <= 0 || imageArea <= 0)
             {
                 return false;
             }
 
-            var imageArea = (double)image.Bounds.Width * (double)image.Bounds.Height;
+            var overlapLeft = Math.Max(image.Bounds.Left, cropBox.Left);
+            var overlapRight = Math.Min(image.Bounds.Right, cropBox.Right);
+            var overlapBottom = Math.Max(image.Bounds.Bottom, cropBox.Bottom);
+            var overlapTop = Math.Min(image.Bounds.Top, cropBox.Top);
 
-            if (imageArea / pageArea < FullPageCoverageThreshold)
+            var overlapWidth = overlapRight - overlapLeft;
+            var overlapHeight = overlapTop - overlapBottom;
+
+            if (overlapWidth <= 0 || overlapHeight <= 0)
+            {
+                return false;
+            }
+
+            var overlapArea = overlapWidth * overlapHeight;
+            var unionArea = imageArea + pageArea - overlapArea;
+            var coverageRatio = overlapArea / unionArea;
+
+            if (coverageRatio < FullPageCoverageThreshold)
             {
                 return false;
             }
